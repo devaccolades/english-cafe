@@ -1,5 +1,10 @@
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth import login
+from django.contrib.auth.models import Group, User
+from django.contrib.auth.hashers import make_password
+
+from accounts.models import ChiefProfile
+from general.encryptions import encrypt
 
 def get_auto_id(model):
     auto_id = 1
@@ -37,3 +42,61 @@ def loginUser(request, user):
         error = {
             "message": "User could not be verified"
         }
+
+
+# def add_entry_day(days):
+#     obj_name = Programme.objects.get(name='Entry')
+#     for i in range(days):
+#         Day.objects.create(
+#             programme = obj_name,
+#             day_number = i + 1
+#         )
+
+# def add_advance_day(days):
+#     obj_name = Programme.objects.get(name='Advanced')
+#     for i in range(days):
+#         Day.objects.create(
+#             programme = obj_name,
+#             day_number = i + 1
+#         )
+
+# def add_ielts_day(days):
+#     obj_name = Programme.objects.get(name='IELTS')
+#     for i in range(days):
+#         Day.objects.create(
+#             programme = obj_name,
+#             day_number = i + 1
+#         )
+
+
+def CreateChiefUser(username,password):
+    if not ChiefProfile.objects.filter(username=username):
+        user = User.objects.create(
+            username = username,
+            password = make_password(password),
+        )
+        group_name = 'EnglishCafe'
+        group, created = Group.objects.get_or_create(name=group_name)
+        user.groups.add(group)
+        chief_profile = ChiefProfile.objects.create(
+            auto_id = get_auto_id(ChiefProfile),
+            username = username,
+            password = encrypt(password),
+            user = user
+        )
+        return "user created"
+    else:
+        return "user already exists"
+    
+
+def get_first_letters(string):
+    words = string.split()
+    
+    if len(words) == 1:
+        code = words[0][0].upper() + words[0][-1].upper()
+    else:
+        code = "".join(word[0] for word in string.split()).upper()
+    
+    return code
+
+
