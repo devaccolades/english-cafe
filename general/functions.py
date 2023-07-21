@@ -3,7 +3,8 @@ from django.contrib.auth import login
 from django.contrib.auth.models import Group, User
 from django.contrib.auth.hashers import make_password
 
-from accounts.models import ChiefProfile
+from accounts.models import ChiefProfile, StudentProfile
+from courses.models import Programme, Day, StudentDay
 from general.encryptions import encrypt
 
 def get_auto_id(model):
@@ -44,29 +45,29 @@ def loginUser(request, user):
         }
 
 
-# def add_entry_day(days):
-#     obj_name = Programme.objects.get(name='Entry')
-#     for i in range(days):
-#         Day.objects.create(
-#             programme = obj_name,
-#             day_number = i + 1
-#         )
+def add_entry_day(days):
+    obj_name = Programme.objects.get(name='Entry')
+    for i in range(days):
+        Day.objects.create(
+            programme = obj_name,
+            day_number = i + 1
+        )
 
-# def add_advance_day(days):
-#     obj_name = Programme.objects.get(name='Advanced')
-#     for i in range(days):
-#         Day.objects.create(
-#             programme = obj_name,
-#             day_number = i + 1
-#         )
+def add_advance_day(days):
+    obj_name = Programme.objects.get(name='Advanced')
+    for i in range(days):
+        Day.objects.create(
+            programme = obj_name,
+            day_number = i + 1
+        )
 
-# def add_ielts_day(days):
-#     obj_name = Programme.objects.get(name='IELTS')
-#     for i in range(days):
-#         Day.objects.create(
-#             programme = obj_name,
-#             day_number = i + 1
-#         )
+def add_ielts_day(days):
+    obj_name = Programme.objects.get(name='IELTS')
+    for i in range(days):
+        Day.objects.create(
+            programme = obj_name,
+            day_number = i + 1
+        )
 
 
 def CreateChiefUser(username,password):
@@ -98,5 +99,31 @@ def get_first_letters(string):
         code = "".join(word[0] for word in string.split()).upper()
     
     return code
+
+
+def create_student_day_for_new_student(student_data, programme):
+    student_id = student_data["student_id"]
+    user_pk = student_data["user_pk"]
+
+    if Day.objects.filter(programme=programme, is_deleted=False).exists():
+
+        day = Day.objects.filter(programme=programme, is_deleted=False).order_by('day_number').first()
+
+        if (student_profile := StudentProfile.objects.filter(pk=student_id,is_deleted=False)).exists():
+            student_profile = student_profile.latest("date_added")
+
+            if not StudentDay.objects.filter(day=day, student_id=student_id, is_deleted=False).exists():
+                student_day = StudentDay.objects.create(
+                    auto_id = get_auto_id(StudentDay),
+                    day = day,
+                    student = student_profile,
+                    status = 'ongoing'
+                )
+            else:
+                pass
+        else:
+            pass
+
+    return True
 
 

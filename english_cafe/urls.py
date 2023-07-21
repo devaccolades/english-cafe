@@ -11,6 +11,7 @@ urlpatterns = [
     path('85a7d858-1370-4f11-b2bb-c914f0d9db4a/', admin.site.urls),
 
     path('api/v1/accounts/', include('api.v1.accounts.urls', namespace='api_v1_accounts')),
+    path('api/v1/courses/', include('api.v1.courses.urls', namespace='api_v1_courses')),
 
     re_path(r'^media/(?P<path>.*)$', serve, {'document_root': settings.MEDIA_ROOT}),
     re_path(r'^static/(?P<path>.*)$', serve, {'document_root': settings.STATIC_ROOT}),

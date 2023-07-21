@@ -12,7 +12,7 @@ from django.contrib.auth.hashers import make_password
 from django.db import transaction
 
 from general.decorators import group_required
-from general.functions import generate_serializer_errors, loginUser, get_first_letters, get_auto_id
+from general.functions import generate_serializer_errors, loginUser, get_first_letters, get_auto_id, create_student_day_for_new_student
 from general.encryptions import decrypt, encrypt
 from api.v1.accounts.serializers import *
 from accounts.models import *
@@ -128,6 +128,13 @@ def create_student_profile(request):
                         programmes = programme
                     )
 
+                    student_data = {
+                        "student_id" : student_profile.id,
+                        "user_pk" : student_profile.user.id
+                    }
+
+                    create_student_day_for_new_student(student_data,programme)
+
                     transaction.commit()
 
                     response_data = {
@@ -142,7 +149,6 @@ def create_student_profile(request):
                         }
                     }
                 else:
-                    print("else trueeeeeeee")
                     response_data = {
                         "StatusCode" : 6001,
                         "data" : {
@@ -235,7 +241,7 @@ def login_student_profile(request):
                     "message" : generate_serializer_errors(serialized_data._errors)
                 }
             }
-            
+
         return Response({'app_data': response_data}, status=status.HTTP_200_OK)
     except Exception as e:
         transaction.rollback()
@@ -252,3 +258,34 @@ def login_student_profile(request):
         }
 
     return Response({'dev_data': response_data}, status=status.HTTP_200_OK)
+
+
+@api_view(['GET'])
+@group_required(['EnglishCafe'])
+def programme_list(request):
+    try:
+        if (programmes := Programme.objects.filter(is_deleted=False)).exists():
+
+            serialized_data = ProgrammeListSerializers(
+                programmes,
+                context = {
+                    "request" : request
+                },
+                many=True
+            ).data
+
+            response_data = {
+                "StatusCode" : 6000,
+                "data" : serialized_data
+            }
+        else:
+            response_data = {
+                "StatusCode" : 6001,
+                "data" : {
+                    "title" : "Failed",
+                    "message" : "Programme not found" 
+                }
+            }
+        return Response({'app_data': response_data}, status=status.HTTP_200_OK)
+    except Exception as E:
+        return Response({'app_data': 'something went wrong', 'dev_data': str(E)}, status=status.HTTP_400_BAD_REQUEST)

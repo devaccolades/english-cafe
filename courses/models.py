@@ -4,8 +4,6 @@ import re
 from django.db import models
 
 from general.models import BaseModel
-from general.middlewares import RequestMiddleware
-from general.functions import get_auto_id
 
 
 STUDENT_DAY_STATUS_CHOICES = (
@@ -20,23 +18,6 @@ class Programme(BaseModel):
     duration = models.CharField(max_length=155)
     description = models.TextField()
     order_id = models.PositiveIntegerField()
-
-    def save(self, *args, **kwargs):
-        if not self.creator:
-            # First we need create an instance of that and later get the current_request assigned
-            request = RequestMiddleware(get_response=None)
-            request = request.thread_local.current_request
-
-            if self._state.adding:
-                auto_id = get_auto_id(Programme)
-                self.creator = request.user
-                self.updater = request.user
-                self.auto_id = auto_id
-
-                self.search_campus_name = "".join(re.sub("[^a-zA-Z]+", "", self.name).lower())
-
-            
-        super(Programme, self).save(*args, **kwargs)
 
     class Meta:
         db_table = 'courses_programme'
@@ -53,6 +34,8 @@ class Day(models.Model):
     programme = models.ForeignKey('courses.Programme', on_delete=models.CASCADE, null=True, blank=True)
     day_number = models.CharField(max_length=255)
     no_of_contents = models.CharField(max_length=255)
+    is_deleted = models.BooleanField(default=False)
+
 
     class Meta:
         db_table = 'courses_day'
@@ -65,64 +48,26 @@ class Day(models.Model):
 
 
 class DailyTopics(BaseModel):
-    day = models.ForeignKey("courses.Day", on_delete=models.CASCADE, null=True, blank=True)
-    video_url_1 = models.CharField(max_length=255, null=True, blank=True)
-    video_url_2 = models.CharField(max_length=255, null=True, blank=True)
-    video_url_3 = models.CharField(max_length=255, null=True, blank=True)
-    text_1 = models.TextField()
-    text_2 = models.TextField()
-    text_3 = models.TextField()
-    audio_1 = models.CharField(max_length=255, null=True, blank=True)
-    audio_2 = models.CharField(max_length=255, null=True, blank=True)
-    audio_3= models.CharField(max_length=255, null=True, blank=True)
-    image = models.ImageField(max_length=255, null=True, blank=True)
-    order_id = models.CharField(max_length=125)
-
-    def save(self, *args, **kwargs):
-        if not self.creator:
-            # First we need create an instance of that and later get the current_request assigned
-            request = RequestMiddleware(get_response=None)
-            request = request.thread_local.current_request
-
-            if self._state.adding:
-                auto_id = get_auto_id(DailyTopics)
-                self.auto_id = auto_id
-
-                self.search_campus_name = "".join(re.sub("[^a-zA-Z]+", "", self.name).lower())
-
-            
-        super(DailyTopics, self).save(*args, **kwargs)
+    daily_audio_topic = models.ForeignKey("courses.DailyAudioTopic", on_delete=models.CASCADE, null=True, blank=True)
+    daily_video_topic = models.ForeignKey("courses.DailyVideoTopic", on_delete=models.CASCADE, null=True, blank=True)
+    daily_text_topic = models.ForeignKey("courses.DailyTextTopic", on_delete=models.CASCADE, blank=True, null=True)
+    daily_image_topic = models.ForeignKey("courses.DailyImageTopic", on_delete=models.CASCADE, blank=True, null=True)
 
     class Meta:
-        db_table = 'courses_daily_topics'
-        verbose_name = ('Daily topic')
-        verbose_name_plural = ('Daily topics')
+        db_table = 'courses_daily_topic'
+        verbose_name = ('Daily Topic')
+        verbose_name_plural = ('Daily Topics')
         ordering = ('id',)
 
     def __str__(self):
-        return "{}_{}".format(self.day.__str__())
-    
+        return "{}-{}".format(self.daily_audio_topic.__str__(),self.daily_video_topic.__str__(),self.daily_text_topic.__str__())
+
 
 class StudentDay(BaseModel):
     day = models.ForeignKey("courses.Day", on_delete=models.CASCADE)
     student = models.ForeignKey("accounts.StudentProfile", on_delete=models.CASCADE)
     status = models.CharField(max_length=128, choices=STUDENT_DAY_STATUS_CHOICES, default="ongoing")
     is_completed = models.BooleanField(default=False)
-
-    def save(self, *args, **kwargs):
-        if not self.creator:
-            # First we need create an instance of that and later get the current_request assigned
-            request = RequestMiddleware(get_response=None)
-            request = request.thread_local.current_request
-
-            if self._state.adding:
-                auto_id = get_auto_id(StudentDay)
-                self.auto_id = auto_id
-
-                self.search_campus_name = "".join(re.sub("[^a-zA-Z]+", "", self.name).lower())
-
-            
-        super(StudentDay, self).save(*args, **kwargs)
 
     class Meta:
         db_table = 'courses_student_day'
@@ -132,6 +77,144 @@ class StudentDay(BaseModel):
 
     def __str__(self):
         return "{}-{}".format(self.day.__str__(),self.student.__str__())
+    
+
+class DailyAudioTopic(BaseModel):
+    day = models.ForeignKey('courses.Day', on_delete=models.CASCADE, null=True, blank=True)
+    audio = models.FileField(upload_to="courses/audio/", null=True, blank=True)
+    text = models.TextField(null=True, blank=True)
+    order_id = models.PositiveIntegerField(null=True, blank=True)
+
+    class Meta:
+        db_table = 'courses_daily_audio_topic'
+        verbose_name = ('Daily Audio topic')
+        verbose_name_plural = ('Daily Audio topics')
+        ordering = ('id',)
+    
+    def __str__(self):
+        return "{}-{}".format(self.day.__str__(), self.audio.__str__())
+
+    
+class StudentDailyAudioTopic(BaseModel):
+    daily_audio_topic = models.ForeignKey("courses.DailyAudioTopic", on_delete=models.CASCADE, null=True, blank=True)
+    student_profile = models.ForeignKey("accounts.StudentProfile", on_delete=models.CASCADE, null=True, blank=True)
+    is_completed = models.BooleanField(default=False)
+
+    class Meta:
+        db_table = 'courses_student_daily_audio_topic'
+        verbose_name = ('Student Daily Audio topic')
+        verbose_name_plural = ('Student Daily Audio topics')
+        ordering = ('id',)
+
+    def __str__(self):
+        return "{}-{}".format(self.daily_audio_topic.__str__(), self.student_profile.__str__()) 
+    
+
+class DailyVideoTopic(BaseModel):
+    day = models.ForeignKey('courses.Day', on_delete=models.CASCADE, null=True, blank=True)
+    video = models.FileField(upload_to="courses/video/", null=True, blank=True)
+    order_id = models.PositiveIntegerField(null=True, blank=True)
+
+    class Meta:
+        db_table = 'courses_daily_video_topic'
+        verbose_name = ('Daily Video topic')
+        verbose_name_plural = ('Daily Video topics')
+        ordering = ('id',)
+    
+    def __str__(self):
+        return "{}-{}".format(self.day.__str__(), self.video.__str__()) 
+    
+
+class StudentDailyVideoTopic(BaseModel):
+    daily_video_topic = models.ForeignKey("courses.DailyVideoTopic", on_delete=models.CASCADE, null=True, blank=True)
+    student_profile = models.ForeignKey("accounts.StudentProfile", on_delete=models.CASCADE, null=True, blank=True)
+    is_completed = models.BooleanField(default=False)
+
+    class Meta:
+        db_table = 'courses_student_daily_video_topic'
+        verbose_name = ('Student Daily Video topic')
+        verbose_name_plural = ('Student Daily Video topics')
+        ordering = ('id',)
+
+    def __str__(self):
+        return "{}-{}".format(self.daily_video_topic.__str__(), self.student_profile.__str__()) 
+    
+
+class DailyTextTopic(BaseModel):
+    day = models.ForeignKey('courses.Day', on_delete=models.CASCADE, null=True, blank=True)
+    daily_text = models.TextField(null=True, blank=True)
+    order_id = models.PositiveIntegerField( null=True, blank=True)
+
+    class Meta:
+        db_table = 'courses_daily_text_topic'
+        verbose_name = ('Daily Text Topic')
+        verbose_name_plural = ('Daily Text Topics')
+        ordering = ('id',)
+
+    def __str__(self):
+        return "{}-{}".format(self.day.__str__(), self.daily_text.__str__()) 
+    
+
+class StudentDailyTextTopic(BaseModel):
+    daily_text_topic = models.ForeignKey("courses.DailyTextTopic", on_delete=models.CASCADE, blank=True, null=True)
+    student_profile = models.ForeignKey("accounts.StudentProfile", on_delete=models.CASCADE, null=True, blank=True)
+    is_completed = models.BooleanField(default=False)
+
+    class Meta:
+        db_table = 'courses_student_daily_text_topic'
+        verbose_name = ('Student Daily Text Topic')
+        verbose_name_plural = ('Student Daily Text Topics')
+        ordering = ('id',)
+
+    def __str__(self):
+        return "{}-{}".format(self.daily_text_topic.__str__(), self.student_profile.__str__()) 
+    
+
+class DailyImageTopic(BaseModel):
+    day = models.ForeignKey('courses.Day', on_delete=models.CASCADE, null=True, blank=True)
+    daily_image = models.FileField(upload_to="courses/image", blank=True, null=True)
+    order_id = models.PositiveIntegerField(blank=True, null=True)
+
+    class Meta:
+        db_table = 'courses_daily_image_topic'
+        verbose_name = ('Daily Image Topic')
+        verbose_name_plural = ('Daily Image Topics')
+        ordering = ('id',)
+
+    def __str__(self):
+        return "{}-{}".format(self.day.__str__(), self.daily_image.__str__()) 
+    
+
+class StudentDailyImageTopic(BaseModel):
+    daily_image_topic = models.ForeignKey("courses.DailyImageTopic", on_delete=models.CASCADE, blank=True, null=True)
+    student_profile = models.ForeignKey("accounts.StudentProfile", on_delete=models.CASCADE, null=True, blank=True)
+    is_completed = models.BooleanField(default=False)
+
+
+    class Meta:
+        db_table = 'courses_student_daily_image_topic'
+        verbose_name = ('Student Daily Image Topic')
+        verbose_name_plural = ('Student Daily Image Topics')
+        ordering = ('id',)
+
+    def __str__(self):
+        return "{}-{}".format(self.daily_image_topic.__str__(), self.student_profile.__str__()) 
+
+
+
+
+
+
+
+
+    
+
+
+
+
+
+
+
     
     
 
