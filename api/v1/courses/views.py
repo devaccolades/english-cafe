@@ -9,7 +9,6 @@ from courses.models import *
 from api.v1.courses.serializers import *
 
 
-
 @api_view(['GET'])
 @group_required(['Student'])
 def get_daily_topics(request, pk):

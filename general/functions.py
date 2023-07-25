@@ -4,8 +4,11 @@ from django.contrib.auth.models import Group, User
 from django.contrib.auth.hashers import make_password
 
 from accounts.models import ChiefProfile, StudentProfile
-from courses.models import Programme, Day, StudentDay
+from courses.models import (Programme, Day, StudentDay, DailyAudioTopic, StudentDailyAudioTopic, 
+                            DailyVideoTopic, StudentDailyVideoTopic, DailyImageTopic, StudentDailyImageTopic, 
+                            DailyTextTopic, StudentDailyTextTopic)
 from general.encryptions import encrypt
+
 
 def get_auto_id(model):
     auto_id = 1
@@ -45,29 +48,31 @@ def loginUser(request, user):
         }
 
 
-def add_entry_day(days):
-    obj_name = Programme.objects.get(name='Entry')
-    for i in range(days):
-        Day.objects.create(
-            programme = obj_name,
-            day_number = i + 1
-        )
+# def add_day(days,)
 
-def add_advance_day(days):
-    obj_name = Programme.objects.get(name='Advanced')
-    for i in range(days):
-        Day.objects.create(
-            programme = obj_name,
-            day_number = i + 1
-        )
+# def add_entry_day(days):
+#     obj_name = Programme.objects.get(name='Entry')
+#     for i in range(days):
+#         Day.objects.create(
+#             programme = obj_name,
+#             day_number = i + 1
+#         )
 
-def add_ielts_day(days):
-    obj_name = Programme.objects.get(name='IELTS')
-    for i in range(days):
-        Day.objects.create(
-            programme = obj_name,
-            day_number = i + 1
-        )
+# def add_advance_day(days):
+#     obj_name = Programme.objects.get(name='Advanced')
+#     for i in range(days):
+#         Day.objects.create(
+#             programme = obj_name,
+#             day_number = i + 1
+#         )
+
+# def add_ielts_day(days):
+#     obj_name = Programme.objects.get(name='IELTS')
+#     for i in range(days):
+#         Day.objects.create(
+#             programme = obj_name,
+#             day_number = i + 1
+#         )
 
 
 def CreateChiefUser(username,password):
@@ -108,6 +113,7 @@ def create_student_day_for_new_student(student_data, programme):
     if Day.objects.filter(programme=programme, is_deleted=False).exists():
 
         day = Day.objects.filter(programme=programme, is_deleted=False).order_by('day_number').first()
+        number_of_contents = day.no_of_contents
 
         if (student_profile := StudentProfile.objects.filter(pk=student_id,is_deleted=False)).exists():
             student_profile = student_profile.latest("date_added")
@@ -119,11 +125,80 @@ def create_student_day_for_new_student(student_data, programme):
                     student = student_profile,
                     status = 'ongoing'
                 )
-            else:
-                pass
+            
         else:
             pass
 
     return True
+
+
+def create_student_first_topic_for_a_new_student(student_data, programme):
+    student_id = student_data["student_id"]
+    user_pk = student_data["user_pk"]
+
+    if Day.objects.filter(programme=programme, is_deleted=False).exists():
+
+        day = Day.objects.filter(programme=programme, is_deleted=False).order_by('day_number').first()
+        number_of_contents = day.no_of_contents
+
+        if (student_profile := StudentProfile.objects.filter(pk=student_id,is_deleted=False)).exists():
+            student_profile = student_profile.latest("date_added")
+
+            if (daily_audio_topics := DailyAudioTopic.objects.filter(day=day, order_id=1)).exists():
+                daily_audio_topics = daily_audio_topics.latest("date_added")
+                if not StudentDailyAudioTopic.objects.filter(daily_audio_topic=daily_audio_topics, student_profile=student_profile).exists():
+                    student_daily_topic = StudentDailyAudioTopic.objects.create(
+                        auto_id = get_auto_id(StudentDailyAudioTopic),
+                        daily_audio_topic = daily_audio_topics,
+                        student_profile = student_profile,
+                        is_completed = False
+                    )
+                else:
+                    print("Already Exists")
+
+            elif (daily_video_topic := DailyVideoTopic.objects.filter(day=day, order_id=1)).exists():
+                daily_video_topic = daily_video_topic.latest('date_added')
+                if not StudentDailyVideoTopic.objects.filter(daily_video_topic=daily_video_topic, student_profile=student_profile).exists():
+                    student_video_topic = StudentDailyVideoTopic.objects.create(
+                        auto_id = get_auto_id(StudentDailyVideoTopic),
+                        daily_video_topic = daily_video_topic,
+                        student_profile = student_profile,
+                        is_completed = False
+                    )
+                else:
+                    print("Already Exists")
+
+            elif (daily_image_topic := DailyImageTopic.objects.filter(day=day, order_id=1)).exists():
+                daily_image_topic = daily_image_topic.latest("date_added")
+                if not StudentDailyImageTopic.objects.filter(daily_image_topic=daily_image_topic, student_profile=student_profile).exists():
+                    student_image_topic = StudentDailyImageTopic.objects.create(
+                        auto_id = get_auto_id(StudentDailyImageTopic),
+                        daily_image_topic = daily_image_topic,
+                        student_profile = student_profile,
+                        is_completed = False
+                    )
+                else:
+                    print("Already Exists")
+
+            elif (daily_text_topic := DailyTextTopic.objects.filter(day=day, order_id=1)).exists():
+                daily_text_topic = daily_text_topic.latest("date_added")
+
+                if not StudentDailyTextTopic.objects.filter(daily_text_topic=daily_text_topic, student_profile=student_profile).exists():
+                    student_text_topic = StudentDailyTextTopic.objects.create(
+                        auto_id = get_auto_id(StudentDailyTextTopic),
+                        daily_text_topic = daily_text_topic,
+                        student_profile = student_profile,
+                        is_completed = False
+                    )
+                else:
+                    print("Already Exists")
+            
+            else:
+                pass
+        else:
+            print("Student not exists")
+
+    return True
+            
 
 

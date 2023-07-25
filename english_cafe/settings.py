@@ -55,7 +55,8 @@ INSTALLED_APPS = [
 
     'accounts',
     'general',
-    'courses'
+    'courses',
+    'company_profile',
 ]
 
 MIDDLEWARE = [

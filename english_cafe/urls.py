@@ -12,6 +12,7 @@ urlpatterns = [
 
     path('api/v1/accounts/', include('api.v1.accounts.urls', namespace='api_v1_accounts')),
     path('api/v1/courses/', include('api.v1.courses.urls', namespace='api_v1_courses')),
+    path('api/v1/company_profile/', include('api.v1.company_profile.urls', namespace='api_v1_company_profile')),
 
     re_path(r'^media/(?P<path>.*)$', serve, {'document_root': settings.MEDIA_ROOT}),
     re_path(r'^static/(?P<path>.*)$', serve, {'document_root': settings.STATIC_ROOT}),

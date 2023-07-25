@@ -12,7 +12,7 @@ from django.contrib.auth.hashers import make_password
 from django.db import transaction
 
 from general.decorators import group_required
-from general.functions import generate_serializer_errors, loginUser, get_first_letters, get_auto_id, create_student_day_for_new_student
+from general.functions import generate_serializer_errors, loginUser, get_first_letters, get_auto_id, create_student_day_for_new_student, create_student_first_topic_for_a_new_student
 from general.encryptions import decrypt, encrypt
 from api.v1.accounts.serializers import *
 from accounts.models import *
@@ -134,6 +134,7 @@ def create_student_profile(request):
                     }
 
                     create_student_day_for_new_student(student_data,programme)
+                    create_student_first_topic_for_a_new_student(student_data, programme)
 
                     transaction.commit()
 
