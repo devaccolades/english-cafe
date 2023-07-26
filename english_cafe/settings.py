@@ -36,7 +36,9 @@ SIMPLE_JWT = {
 
 DEBUG = env.bool("DEBUG", False)
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [ '*']
+
+CORS_ALLOW_ALL_ORIGINS = True
 
 
 # Application definition
