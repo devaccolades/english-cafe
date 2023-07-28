@@ -50,29 +50,29 @@ def loginUser(request, user):
 
 # def add_day(days,)
 
-# def add_entry_day(days):
-#     obj_name = Programme.objects.get(name='Entry')
-#     for i in range(days):
-#         Day.objects.create(
-#             programme = obj_name,
-#             day_number = i + 1
-#         )
+def add_entry_day(days):
+    obj_name = Programme.objects.get(name='Entry')
+    for i in range(days):
+        Day.objects.create(
+            programme = obj_name,
+            day_number = i + 1
+        )
 
-# def add_advance_day(days):
-#     obj_name = Programme.objects.get(name='Advanced')
-#     for i in range(days):
-#         Day.objects.create(
-#             programme = obj_name,
-#             day_number = i + 1
-#         )
+def add_advance_day(days):
+    obj_name = Programme.objects.get(name='Advanced')
+    for i in range(days):
+        Day.objects.create(
+            programme = obj_name,
+            day_number = i + 1
+        )
 
-# def add_ielts_day(days):
-#     obj_name = Programme.objects.get(name='IELTS')
-#     for i in range(days):
-#         Day.objects.create(
-#             programme = obj_name,
-#             day_number = i + 1
-#         )
+def add_ielts_day(days):
+    obj_name = Programme.objects.get(name='IELTS')
+    for i in range(days):
+        Day.objects.create(
+            programme = obj_name,
+            day_number = i + 1
+        )
 
 
 def CreateChiefUser(username,password):
@@ -151,7 +151,7 @@ def create_student_first_topic_for_a_new_student(student_data, programme):
                         auto_id = get_auto_id(StudentDailyAudioTopic),
                         daily_audio_topic = daily_audio_topics,
                         student_profile = student_profile,
-                        is_completed = False
+                        is_processed = True,
                     )
                 else:
                     print("Already Exists")
@@ -163,7 +163,7 @@ def create_student_first_topic_for_a_new_student(student_data, programme):
                         auto_id = get_auto_id(StudentDailyVideoTopic),
                         daily_video_topic = daily_video_topic,
                         student_profile = student_profile,
-                        is_completed = False
+                        is_processed = True,
                     )
                 else:
                     print("Already Exists")
@@ -175,7 +175,7 @@ def create_student_first_topic_for_a_new_student(student_data, programme):
                         auto_id = get_auto_id(StudentDailyImageTopic),
                         daily_image_topic = daily_image_topic,
                         student_profile = student_profile,
-                        is_completed = False
+                        is_processed = True,
                     )
                 else:
                     print("Already Exists")
@@ -188,7 +188,7 @@ def create_student_first_topic_for_a_new_student(student_data, programme):
                         auto_id = get_auto_id(StudentDailyTextTopic),
                         daily_text_topic = daily_text_topic,
                         student_profile = student_profile,
-                        is_completed = False
+                        is_processed = True,
                     )
                 else:
                     print("Already Exists")
