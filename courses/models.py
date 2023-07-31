@@ -32,7 +32,7 @@ class Programme(BaseModel):
 class Day(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     programme = models.ForeignKey('courses.Programme', on_delete=models.CASCADE, null=True, blank=True)
-    day_number = models.CharField(max_length=255)
+    day_number = models.PositiveIntegerField()
     no_of_contents = models.CharField(max_length=255, null=True, blank=True)
     is_deleted = models.BooleanField(default=False)
 

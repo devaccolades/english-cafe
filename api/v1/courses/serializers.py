@@ -208,3 +208,48 @@ class AddDailyTopicSerializer(serializers.Serializer):
     day = serializers.CharField()
     topic_type = serializers.CharField()
     order_id = serializers.CharField()
+
+
+class AdminDayListSerializer(serializers.ModelSerializer):
+    programme = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Day
+        fields = (
+            'id',
+            'programme',
+            'day_number',
+            'no_of_contents'
+        )
+    
+    def get_programme(self, instance):
+        if instance.programme:
+            return instance.programme.name
+        else:
+            return None
+        
+
+class AddDaysSerializer(serializers.Serializer):
+    days = serializers.CharField()
+
+
+class ProgrammeListSerializers(serializers.ModelSerializer):
+    class Meta:
+        model = Programme
+        fields = (
+            'id',
+            'name',
+            'duration',
+            'description',
+            'order_id'
+        )
+
+
+class AddProgrammeSerializer(serializers.Serializer):
+    name = serializers.CharField()
+    duration = serializers.CharField()
+    description = serializers.CharField()
+    order_id = serializers.CharField()
+
+
+    

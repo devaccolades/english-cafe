@@ -9,11 +9,59 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny, IsAdminUser, IsAuthenticated
 
 from general.decorators import group_required
-from general.functions import generate_serializer_errors, get_auto_id
+from general.functions import generate_serializer_errors, get_auto_id, assing_first_topic_of_a_day
 from courses.models import *
 from accounts.models import StudentProfile
 from api.v1.courses.serializers import *
 from api.v1.courses.functions import assign_next_topic
+
+
+@api_view(['GET'])
+@group_required(['EnglishCafe'])
+def programme_list(request):
+    try:
+        transaction.set_autocommit(False)
+        if (programmes := Programme.objects.filter(is_deleted=False)).exists():
+
+            serialized_data = ProgrammeListSerializers(
+                programmes,
+                context = {
+                    "request" : request
+                },
+                many=True
+            ).data
+
+            transaction.commit()
+            response_data = {
+                "StatusCode" : 6000,
+                "data" : serialized_data
+            }
+        else:
+            response_data = {
+                "StatusCode" : 6001,
+                "data" : {
+                    "title" : "Failed",
+                    "message" : "Programme not found" 
+                }
+            }
+        return Response({'app_data': response_data}, status=status.HTTP_200_OK)
+    
+    except Exception as e:
+        transaction.rollback()
+        errType = e.__class__.__name__
+        errors = {
+            errType: traceback.format_exc()
+        }
+        response_data = {
+            "status": 0,
+            "api": request.get_full_path(),
+            "request": request.data,
+            "message": str(e),
+            "response": errors
+        }
+
+    return Response({'app_data': response_data}, status=status.HTTP_200_OK)
+    
 
 @api_view(['GET'])
 @group_required(['Student'])
@@ -321,7 +369,7 @@ def daily_topic_complete(request, pk):
                             "StatusCode" : 6000,
                             "data" : {
                                 "title" : "Success",
-                                "message" : "Student daily audio completed successfully"
+                                "message" : "Student daily video completed successfully"
                             }
                         }
                     else:
@@ -346,7 +394,7 @@ def daily_topic_complete(request, pk):
                             "StatusCode" : 6000,
                             "data" : {
                                 "title" : "Success",
-                                "message" : "Student daily audio completed successfully"
+                                "message" : "Student daily video completed successfully"
                             }
                         }
                     else:
@@ -387,7 +435,7 @@ def daily_topic_complete(request, pk):
                             "StatusCode" : 6000,
                             "data" : {
                                 "title" : "Success",
-                                "message" : "Student daily audio completed successfully"
+                                "message" : "Student daily image completed successfully"
                             }
                         }
                     else:
@@ -412,7 +460,7 @@ def daily_topic_complete(request, pk):
                             "StatusCode" : 6000,
                             "data" : {
                                 "title" : "Success",
-                                "message" : "Student daily audio completed successfully"
+                                "message" : "Student daily image completed successfully"
                             }
                         }
                     else:
@@ -428,7 +476,7 @@ def daily_topic_complete(request, pk):
                         "StatusCode" : 6001,
                         "data" : {
                             "title" : "Failed",
-                            "message" : "Student daily video topic already exists"
+                            "message" : "Student daily image topic already exists"
                         }
                     }
 
@@ -453,7 +501,7 @@ def daily_topic_complete(request, pk):
                             "StatusCode" : 6000,
                             "data" : {
                                 "title" : "Success",
-                                "message" : "Student daily audio completed successfully"
+                                "message" : "Student daily text completed successfully"
                             }
                         }
                     else:
@@ -479,7 +527,7 @@ def daily_topic_complete(request, pk):
                             "StatusCode" : 6000,
                             "data" : {
                                 "title" : "Success",
-                                "message" : "Student daily audio completed successfully"
+                                "message" : "Student daily text completed successfully"
                             }
                         }
                     else:
@@ -542,6 +590,8 @@ def mark_as_complete(request, pk):
         user = request.user
         if (day := Day.objects.filter(pk=pk, is_deleted=False)).exists():
             day = day.latest("id")
+            day_number = day.day_number
+            next_day_number = day_number + 1
 
             if (student := StudentProfile.objects.filter(user=user, is_deleted=False)).exists():
                 student = student.latest("date_added")
@@ -571,14 +621,31 @@ def mark_as_complete(request, pk):
                                                 status = 'ongoing',
                                             )
 
-                                            transaction.commit()
-                                            response_data = {
-                                                "StatusCode" : 6000,
-                                                "data" : {
-                                                    "title" : "Success",
-                                                    "message" : f"Successfully completed day-{day.day_number} and unlocked day-{next_day_number}"
-                                                }
+                                            student_data = {
+                                                "student_id" : student.id,
+                                                "user_pk" : student.user.id
                                             }
+
+                                            if Day.objects.filter(programme=programme, day_number=next_day_number).exists():
+
+                                                assing_first_topic_of_a_day(student_data, programme, next_day_number)
+
+                                                transaction.commit()
+                                                response_data = {
+                                                    "StatusCode" : 6000,
+                                                    "data" : {
+                                                        "title" : "Success",
+                                                        "message" : f"Successfully completed day-{day.day_number} and unlocked day-{next_day_number}"
+                                                    }
+                                                }
+                                            else:
+                                                response_data = {
+                                                    "StatusCode" : 6001,
+                                                    "data" : {
+                                                        "title" : "Failed",
+                                                        "message" : "Next day is not available"
+                                                    }
+                                                }
                                         else:
                                             response_data = {
                                                 "StatusCode" : 6001,
@@ -596,9 +663,6 @@ def mark_as_complete(request, pk):
                                                 "message" : "An error occurred in assign next day"
                                             }
                                         }
-
-                                    
-
                                 else:
                                     response_data = {
                                         "StatusCode" : 6001,
@@ -612,7 +676,7 @@ def mark_as_complete(request, pk):
                                     "StatusCode" : 6001,
                                     "data" : {
                                     "title" : "Failed",
-                                    "message" : "Student daily image topic not found"
+                                    "message" : "Student daily image topic not complete"
                                 }
                             }
                         else:
@@ -620,7 +684,7 @@ def mark_as_complete(request, pk):
                             "StatusCode" : 6001,
                             "data" : {
                                 "title" : "Failed",
-                                "message" : "Student daily text topic not found"
+                                "message" : "Student daily text topic not complete"
                             }
                         }
                     else:
@@ -628,7 +692,7 @@ def mark_as_complete(request, pk):
                             "StatusCode" : 6001,
                             "data" : {
                                 "title" : "Failed",
-                                "message" : "Student daily video topic not found"
+                                "message" : "Student daily video topic not complete"
                             }
                         }
                 else:
@@ -636,7 +700,7 @@ def mark_as_complete(request, pk):
                         "StatusCode" : 6001,
                         "data" : {
                             "title" : "Failed",
-                            "message" : "Student daily audio topic not found"
+                            "message" : "Student daily audio topic not complete"
                         }
                     }
             else:
@@ -675,6 +739,71 @@ def mark_as_complete(request, pk):
 
     return Response({'app_data': response_data}, status=status.HTTP_200_OK)
 
+
+@api_view(['POST'])
+@group_required(['EnglishCafe'])
+def add_programme(request):
+    try:
+        transaction.set_autocommit(False)
+        serialized_data = AddProgrammeSerializer(data = request.data)
+        if serialized_data.is_valid():
+            name = request.data["name"]
+            duration = request.data["duration"]
+            description = request.data["description"]
+            order_id = request.data["order_id"]
+
+            if not Programme.objects.filter(order_id=order_id).exists():
+
+                programme = Programme.objects.create(
+                    auto_id = get_auto_id(Programme),
+                    name = name,
+                    duration = duration,
+                    description = description,
+                    order_id = order_id
+                )
+                
+                # transaction.commit()
+                response_data = {
+                    "StatusCode" : 6000,
+                    "data" : {
+                        "title" : "Success",
+                        "message" : f'{programme.name} programme created successfully'
+                    }
+                }
+            else:
+                response_data = {
+                    "StatusCode" : 6001,
+                    "data" : {
+                        "title" : "Failed",
+                        "message" : "Programme already exists"
+                    }
+                }
+        else:
+            response_data = {
+                "StatusCode" : 6001,
+                "data" : {
+                    "title" : "Failed",
+                    "message" : generate_serializer_errors(serialized_data._errors)
+                }
+            }
+        return Response({'app_data': response_data}, status=status.HTTP_200_OK)
+
+    except Exception as e:
+        transaction.rollback()
+        errType = e.__class__.__name__
+        errors = {
+            errType: traceback.format_exc()
+        }
+        response_data = {
+            "status": 0,
+            "api": request.get_full_path(),
+            "request": request.data,
+            "message": str(e),
+            "response": errors
+        }
+
+    return Response({'app_data': response_data}, status=status.HTTP_200_OK)
+    
 
 
 @api_view(['POST'])
@@ -801,6 +930,136 @@ def add_daily_topics(request):
         }
 
     return Response({'app_data': response_data}, status=status.HTTP_200_OK)
+
+
+@api_view(['GET'])
+@group_required(['EnglishCafe'])
+def days_list_programme(request,pk):
+    try:
+        transaction.set_autocommit(False)
+
+        if (programme := Programme.objects.filter(pk=pk,is_deleted=False)).exists():
+            programme = programme.latest("date_added")
+
+            if (days := Day.objects.filter(programme=programme, is_deleted=False)).exists():
+                days = days.order_by('day_number')
+                serialized_data = AdminDayListSerializer(
+                    days,
+                    context = {
+                        "request" : request
+                    },
+                    many=True
+                ).data
+
+                response_data = {
+                    "StatusCode" : 6000,
+                    "data" : serialized_data
+                }
+            else:
+                response_data = {
+                    "StatusCode" : 6001,
+                    "data" : {
+                        "title" : "Failed",
+                        "message" : "Day not found"
+                    }
+                }
+        else:
+            response_data = {
+                "StatusCode" : 6001,
+                "data" :{
+                    "title" : "Failed",
+                    "message" : "Programme not found"
+                }
+            }
+        return Response({'app_data': response_data}, status=status.HTTP_200_OK)
+        
+    except Exception as e:
+        transaction.rollback()
+        errType = e.__class__.__name__
+        errors = {
+            errType: traceback.format_exc()
+        }
+        response_data = {
+            "status": 0,
+            "api": request.get_full_path(),
+            "request": request.data,
+            "message": str(e),
+            "response": errors
+        }
+
+    return Response({'app_data': response_data}, status=status.HTTP_200_OK)
+
+
+@api_view(['POST'])
+@group_required(['EnglishCafe'])
+def add_days(request, pk):
+    try:
+        transaction.set_autocommit(False)
+        serialized_data = AddDaysSerializer(data = request.data)
+        if serialized_data.is_valid():
+            days = request.data["days"]
+            days = int(days)
+
+            if (programme := Programme.objects.filter(pk=pk, is_deleted=False)).exists():
+                programme = programme.latest("date_added")
+
+                if not Day.objects.filter(programme=programme).exists():
+                    for i in range(days):
+                        Day.objects.create(
+                            programme = programme,
+                            day_number = i + 1
+                        )
+                    
+                    transaction.commit()
+                    response_data = {
+                        "StatusCode" : 6000,
+                        "data" : {
+                            "title" : "Success",
+                            "message" : f'{programme.name} days added successfully'
+                        }
+                    }
+                else:
+                    response_data = {
+                        "StatusCode" : 6001,
+                        "data" : {
+                            "title" : "Failed",
+                            "message" : "Days already exists in this programme"
+                        }
+                    }
+            else:
+                response_data = {
+                    "StatusCode" : 6001,
+                    "data" : {
+                        "title" : "Failed",
+                        "message" : "Programme not found"
+                    }
+                }
+        else:
+            response_data = {
+                "StatusCode" : 6001,
+                "data" : {
+                    "title" : "Failed",
+                    "message" : generate_serializer_errors(serialized_data._errors)
+                }
+            }
+        return Response({'app_data': response_data}, status=status.HTTP_200_OK)
+    except Exception as e:
+        transaction.rollback()
+        errType = e.__class__.__name__
+        errors = {
+            errType: traceback.format_exc()
+        }
+        response_data = {
+            "status": 0,
+            "api": request.get_full_path(),
+            "request": request.data,
+            "message": str(e),
+            "response": errors
+        }
+
+    return Response({'app_data': response_data}, status=status.HTTP_200_OK)
+
+
 
 
 

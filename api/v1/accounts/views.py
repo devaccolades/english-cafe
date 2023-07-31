@@ -261,32 +261,4 @@ def login_student_profile(request):
     return Response({'dev_data': response_data}, status=status.HTTP_200_OK)
 
 
-@api_view(['GET'])
-@group_required(['EnglishCafe'])
-def programme_list(request):
-    try:
-        if (programmes := Programme.objects.filter(is_deleted=False)).exists():
 
-            serialized_data = ProgrammeListSerializers(
-                programmes,
-                context = {
-                    "request" : request
-                },
-                many=True
-            ).data
-
-            response_data = {
-                "StatusCode" : 6000,
-                "data" : serialized_data
-            }
-        else:
-            response_data = {
-                "StatusCode" : 6001,
-                "data" : {
-                    "title" : "Failed",
-                    "message" : "Programme not found" 
-                }
-            }
-        return Response({'app_data': response_data}, status=status.HTTP_200_OK)
-    except Exception as E:
-        return Response({'app_data': 'something went wrong', 'dev_data': str(E)}, status=status.HTTP_400_BAD_REQUEST)

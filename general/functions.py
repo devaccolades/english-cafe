@@ -199,6 +199,78 @@ def create_student_first_topic_for_a_new_student(student_data, programme):
             print("Student not exists")
 
     return True
+
+
+def assing_first_topic_of_a_day(student_data, programme, day_number):
+    student_id = student_data["student_id"]
+    user_pk = student_data["user_pk"]
+
+    if Day.objects.filter(programme=programme, is_deleted=False).exists():
+
+        if (day := Day.objects.filter(programme=programme, day_number=day_number, is_deleted=False)).exists():
+            day = day.latest('id')
+            number_of_contents = day.no_of_contents
+
+            if (student_profile := StudentProfile.objects.filter(pk=student_id,is_deleted=False)).exists():
+                student_profile = student_profile.latest("date_added")
+
+                if (daily_audio_topics := DailyAudioTopic.objects.filter(day=day, order_id=1)).exists():
+                    daily_audio_topics = daily_audio_topics.latest("date_added")
+                    if not StudentDailyAudioTopic.objects.filter(daily_audio_topic=daily_audio_topics, student_profile=student_profile).exists():
+                        student_daily_topic = StudentDailyAudioTopic.objects.create(
+                            auto_id = get_auto_id(StudentDailyAudioTopic),
+                            daily_audio_topic = daily_audio_topics,
+                            student_profile = student_profile,
+                            is_processed = True,
+                        )
+                    else:
+                        print("Already Exists")
+
+                elif (daily_video_topic := DailyVideoTopic.objects.filter(day=day, order_id=1)).exists():
+                    daily_video_topic = daily_video_topic.latest('date_added')
+                    if not StudentDailyVideoTopic.objects.filter(daily_video_topic=daily_video_topic, student_profile=student_profile).exists():
+                        student_video_topic = StudentDailyVideoTopic.objects.create(
+                            auto_id = get_auto_id(StudentDailyVideoTopic),
+                            daily_video_topic = daily_video_topic,
+                            student_profile = student_profile,
+                            is_processed = True,
+                        )
+                    else:
+                        print("Already Exists")
+
+                elif (daily_image_topic := DailyImageTopic.objects.filter(day=day, order_id=1)).exists():
+                    daily_image_topic = daily_image_topic.latest("date_added")
+                    if not StudentDailyImageTopic.objects.filter(daily_image_topic=daily_image_topic, student_profile=student_profile).exists():
+                        student_image_topic = StudentDailyImageTopic.objects.create(
+                            auto_id = get_auto_id(StudentDailyImageTopic),
+                            daily_image_topic = daily_image_topic,
+                            student_profile = student_profile,
+                            is_processed = True,
+                        )
+                    else:
+                        print("Already Exists")
+
+                elif (daily_text_topic := DailyTextTopic.objects.filter(day=day, order_id=1)).exists():
+                    daily_text_topic = daily_text_topic.latest("date_added")
+
+                    if not StudentDailyTextTopic.objects.filter(daily_text_topic=daily_text_topic, student_profile=student_profile).exists():
+                        student_text_topic = StudentDailyTextTopic.objects.create(
+                            auto_id = get_auto_id(StudentDailyTextTopic),
+                            daily_text_topic = daily_text_topic,
+                            student_profile = student_profile,
+                            is_processed = True,
+                        )
+                    else:
+                        print("Already Exists")
+                
+                else:
+                    pass
+            else:
+                print("Student not exists")
+        else:
+            pass
+
+    return True
             
 
 
