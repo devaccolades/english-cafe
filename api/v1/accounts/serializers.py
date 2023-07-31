@@ -17,15 +17,3 @@ class CreateStudentProfileSerializer(serializers.Serializer):
 class StudentProfileLoginSerializer(serializers.Serializer):
     username = serializers.CharField()
     password = serializers.CharField()
-
-
-class ProgrammeListSerializers(serializers.ModelSerializer):
-    class Meta:
-        model = Programme
-        fields = (
-            'id',
-            'name',
-            'duration',
-            'description',
-            'order_id'
-        )

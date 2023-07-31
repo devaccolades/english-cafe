@@ -32,8 +32,8 @@ class Programme(BaseModel):
 class Day(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     programme = models.ForeignKey('courses.Programme', on_delete=models.CASCADE, null=True, blank=True)
-    day_number = models.CharField(max_length=255)
-    no_of_contents = models.CharField(max_length=255)
+    day_number = models.PositiveIntegerField()
+    no_of_contents = models.CharField(max_length=255, null=True, blank=True)
     is_deleted = models.BooleanField(default=False)
 
 
@@ -41,7 +41,7 @@ class Day(models.Model):
         db_table = 'courses_day'
         verbose_name = ('Day')
         verbose_name_plural = ('Days')
-        ordering = ('id',)
+        ordering = ('day_number',)
 
     def __str__(self):
         return "{}_{}".format(self.programme.__str__(), self.day_number)
@@ -83,6 +83,7 @@ class DailyAudioTopic(BaseModel):
     day = models.ForeignKey('courses.Day', on_delete=models.CASCADE, null=True, blank=True)
     audio = models.FileField(upload_to="courses/audio/", null=True, blank=True)
     text = models.TextField(null=True, blank=True)
+    next_topic_id = models.CharField(max_length=255,null=True, blank=True)
     order_id = models.PositiveIntegerField(null=True, blank=True)
 
     class Meta:
@@ -99,6 +100,7 @@ class StudentDailyAudioTopic(BaseModel):
     daily_audio_topic = models.ForeignKey("courses.DailyAudioTopic", on_delete=models.CASCADE, null=True, blank=True)
     student_profile = models.ForeignKey("accounts.StudentProfile", on_delete=models.CASCADE, null=True, blank=True)
     is_completed = models.BooleanField(default=False)
+    is_processed = models.BooleanField(default=False)
 
     class Meta:
         db_table = 'courses_student_daily_audio_topic'
@@ -113,6 +115,7 @@ class StudentDailyAudioTopic(BaseModel):
 class DailyVideoTopic(BaseModel):
     day = models.ForeignKey('courses.Day', on_delete=models.CASCADE, null=True, blank=True)
     video = models.FileField(upload_to="courses/video/", null=True, blank=True)
+    next_topic_id = models.CharField(max_length=255,null=True, blank=True)
     order_id = models.PositiveIntegerField(null=True, blank=True)
 
     class Meta:
@@ -129,6 +132,8 @@ class StudentDailyVideoTopic(BaseModel):
     daily_video_topic = models.ForeignKey("courses.DailyVideoTopic", on_delete=models.CASCADE, null=True, blank=True)
     student_profile = models.ForeignKey("accounts.StudentProfile", on_delete=models.CASCADE, null=True, blank=True)
     is_completed = models.BooleanField(default=False)
+    is_processed = models.BooleanField(default=False)
+
 
     class Meta:
         db_table = 'courses_student_daily_video_topic'
@@ -143,7 +148,9 @@ class StudentDailyVideoTopic(BaseModel):
 class DailyTextTopic(BaseModel):
     day = models.ForeignKey('courses.Day', on_delete=models.CASCADE, null=True, blank=True)
     daily_text = models.TextField(null=True, blank=True)
+    next_topic_id = models.CharField(max_length=255,null=True, blank=True)
     order_id = models.PositiveIntegerField( null=True, blank=True)
+
 
     class Meta:
         db_table = 'courses_daily_text_topic'
@@ -159,6 +166,8 @@ class StudentDailyTextTopic(BaseModel):
     daily_text_topic = models.ForeignKey("courses.DailyTextTopic", on_delete=models.CASCADE, blank=True, null=True)
     student_profile = models.ForeignKey("accounts.StudentProfile", on_delete=models.CASCADE, null=True, blank=True)
     is_completed = models.BooleanField(default=False)
+    is_processed = models.BooleanField(default=False)
+
 
     class Meta:
         db_table = 'courses_student_daily_text_topic'
@@ -173,6 +182,7 @@ class StudentDailyTextTopic(BaseModel):
 class DailyImageTopic(BaseModel):
     day = models.ForeignKey('courses.Day', on_delete=models.CASCADE, null=True, blank=True)
     daily_image = models.FileField(upload_to="courses/image", blank=True, null=True)
+    next_topic_id = models.CharField(max_length=255,null=True, blank=True)
     order_id = models.PositiveIntegerField(blank=True, null=True)
 
     class Meta:
@@ -189,6 +199,8 @@ class StudentDailyImageTopic(BaseModel):
     daily_image_topic = models.ForeignKey("courses.DailyImageTopic", on_delete=models.CASCADE, blank=True, null=True)
     student_profile = models.ForeignKey("accounts.StudentProfile", on_delete=models.CASCADE, null=True, blank=True)
     is_completed = models.BooleanField(default=False)
+    is_processed = models.BooleanField(default=False)
+
 
 
     class Meta:
