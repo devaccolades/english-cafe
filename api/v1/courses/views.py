@@ -762,7 +762,7 @@ def add_programme(request):
                     order_id = order_id
                 )
                 
-                # transaction.commit()
+                transaction.commit()
                 response_data = {
                     "StatusCode" : 6000,
                     "data" : {
@@ -803,9 +803,66 @@ def add_programme(request):
         }
 
     return Response({'app_data': response_data}, status=status.HTTP_200_OK)
+
+
+@api_view(['POST'])
+@group_required(['EnglishCafe'])
+def edit_programme(request, pk):
+    try:
+        transaction.set_autocommit(False)
+        programme_name = request.data.get("programme_name")
+        duration = request.data.get("duration")
+        description  = request.data.get("duration")
+        order_id = request.data.get("order_id")
+
+        if (programme := Programme.objects.filter(pk=pk, is_deleted=False)).exists():
+            programme = programme.latest("date_added")
+
+            if programme_name:
+                programme.name = programme_name
+            if duration:
+                programme.duration = duration
+            if description:
+                programme.description = description
+            if order_id:
+                programme.order_id = order_id
+
+            transaction.commit()
+            programme.save()
+
+            response_data = {
+                "StatusCode" : 6000,
+                "data" : {
+                    "title" : "Success",
+                    "message" : "Edit completed successfully"
+                }
+            }
+
+        else:
+            response_data = {
+                "StatusCode" : 6001,
+                "data" :{
+                    "title" : "Failed",
+                    "message" : "Programme not found"
+                }
+            }
+    except Exception as e:
+        transaction.rollback()
+        errType = e.__class__.__name__
+        errors = {
+            errType: traceback.format_exc()
+        }
+        response_data = {
+            "status": 0,
+            "api": request.get_full_path(),
+            "request": request.data,
+            "message": str(e),
+            "response": errors
+        }
+
+    return Response({'app_data': response_data}, status=status.HTTP_200_OK)
     
-
-
+    
 @api_view(['POST'])
 @group_required(['EnglishCafe'])
 def add_daily_topics(request):
@@ -1058,6 +1115,89 @@ def add_days(request, pk):
         }
 
     return Response({'app_data': response_data}, status=status.HTTP_200_OK)
+
+
+@api_view(['POST'])
+@group_required(['EnglishCafe'])
+def add_day(request, pk):
+    try:
+        transaction.set_autocommit(False)
+        serialized_data = AddDaySerializer(data=request.data)
+        if serialized_data.is_valid():
+            day_number = request.data['day_number']
+            no_of_content = request.data.get("no_of_content")
+
+            if (programme := Programme.objects.filter(pk=pk, is_deleted=False)).exists():
+                programme = programme.latest("date_added")
+
+                if (day := Day.objects.filter(programme=programme)).exists():
+                    day = day.latest("day_number")
+
+                    if not Day.objects.filter(programme=programme, day_number=day_number).exists():
+                        
+                        new_day = Day.objects.create(
+                            programme = programme,
+                            day_number = day_number,
+                            no_of_contents = no_of_content
+                        )
+
+                        transaction.commit()
+                        response_data = {
+                            "StatusCode" : 6000,
+                            "data" : {
+                                "title" : "Success",
+                                "message" : f"Day {new_day.day_number} added in the {programme} programme"
+                            }
+                        }
+                    else:
+                        response_data = {
+                            "StatusCode" : 6001,
+                            "data" : {
+                                "title" : "Failed",
+                                "message" : "Day already exists in this programme"
+                            }
+                        }
+                else:
+                    response_data = {
+                        "StatusCode" : 6001,
+                        "data" : {
+                            "title" : "Failed",
+                            "message" : "Day not found"
+                        }
+                    }
+            else:
+                response_data = {
+                    "StatusCode" : 6001,
+                    "data" : {
+                        "title" : "Failed",
+                        "message" : "Programme not found"
+                    }
+                }
+        else:
+            response_data = {
+                "StatusCode" : 6001,
+                "data" : {
+                    "title" : "Failed",
+                    "message" : generate_serializer_errors(serialized_data._errors)
+                }
+            }
+        return Response({'app_data': response_data}, status=status.HTTP_200_OK)
+    except Exception as e:
+        transaction.rollback()
+        errType = e.__class__.__name__
+        errors = {
+            errType: traceback.format_exc()
+        }
+        response_data = {
+            "status": 0,
+            "api": request.get_full_path(),
+            "request": request.data,
+            "message": str(e),
+            "response": errors
+        }
+
+    return Response({'app_data': response_data}, status=status.HTTP_200_OK)
+
 
 
 

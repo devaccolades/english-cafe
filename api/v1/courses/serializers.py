@@ -252,4 +252,7 @@ class AddProgrammeSerializer(serializers.Serializer):
     order_id = serializers.CharField()
 
 
+class AddDaySerializer(serializers.Serializer):
+    day_number = serializers.CharField()
+
     
