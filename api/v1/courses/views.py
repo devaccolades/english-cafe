@@ -812,7 +812,7 @@ def edit_programme(request, pk):
         transaction.set_autocommit(False)
         programme_name = request.data.get("programme_name")
         duration = request.data.get("duration")
-        description  = request.data.get("duration")
+        description  = request.data.get("description")
         order_id = request.data.get("order_id")
 
         if (programme := Programme.objects.filter(pk=pk, is_deleted=False)).exists():
@@ -827,8 +827,8 @@ def edit_programme(request, pk):
             if order_id:
                 programme.order_id = order_id
 
-            transaction.commit()
             programme.save()
+            transaction.commit()
 
             response_data = {
                 "StatusCode" : 6000,
@@ -846,6 +846,8 @@ def edit_programme(request, pk):
                     "message" : "Programme not found"
                 }
             }
+        
+        return Response({'app_data': response_data}, status=status.HTTP_200_OK)
     except Exception as e:
         transaction.rollback()
         errType = e.__class__.__name__
@@ -861,6 +863,54 @@ def edit_programme(request, pk):
         }
 
     return Response({'app_data': response_data}, status=status.HTTP_200_OK)
+
+
+@api_view(['GET'])
+@group_required(['EnglishCafe'])
+def programme(request, pk):
+    try:
+        transaction.set_autocommit(False)
+        
+        if (programme := Programme.objects.filter(pk=pk, is_deleted=False)).exists():
+            programme = programme.latest("date_added")
+
+            serialized_data = ProgrammeListSerializers(
+                programme,
+                context = {
+                    "request" : request
+                },
+            ).data
+
+            transaction.commit()
+            response_data = {
+                "StatusCode" : 6000,
+                "data" : serialized_data
+            }
+        else:
+            response_data = {
+                "StatusCode" : 6001,
+                "data" : {
+                    "title" : "Failed",
+                    "message" : "Programme not found"
+                }
+            }
+        return Response({'app_data': response_data}, status=status.HTTP_200_OK)
+    except Exception as e:
+        transaction.rollback()
+        errType = e.__class__.__name__
+        errors = {
+            errType: traceback.format_exc()
+        }
+        response_data = {
+            "status": 0,
+            "api": request.get_full_path(),
+            "request": request.data,
+            "message": str(e),
+            "response": errors
+        }
+
+    return Response({'app_data': response_data}, status=status.HTTP_200_OK)
+    
     
     
 @api_view(['POST'])
