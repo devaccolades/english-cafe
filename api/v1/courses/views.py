@@ -639,13 +639,33 @@ def mark_as_complete(request, pk):
                                                     }
                                                 }
                                             else:
-                                                response_data = {
-                                                    "StatusCode" : 6001,
-                                                    "data" : {
-                                                        "title" : "Failed",
-                                                        "message" : "Next day is not available"
+                                                if (last_day := Day.objects.filter(programme=programme, is_deleted=False)).exists():
+                                                    last_day = last_day.latest("day_number")
+
+                                                    if next_day_number == last_day.day_number:
+                                                        
+                                                        if (last_student_day := StudentDay.objects.filter(day=last_day, student=student, is_complete=True, status='completed')).exists():
+
+                                                            response_data = {
+                                                                "StatusCode" : 6000,
+                                                                "data" : {
+                                                                    "title" : "Success",
+                                                                    "message" : f"{programme} completed successfully"
+                                                                }
+                                                            }
+                                                        else:
+                                                            pass
+                                                    else:
+                                                        pass
+                                                else:
+                                                    response_data = {
+                                                        "StatusCode" : 6001,
+                                                        "data" : {
+                                                            "title" : "Failed",
+                                                            "message" : "An error occured"
+                                                        }
                                                     }
-                                                }
+
                                         else:
                                             response_data = {
                                                 "StatusCode" : 6001,
@@ -1247,6 +1267,49 @@ def add_day(request, pk):
         }
 
     return Response({'app_data': response_data}, status=status.HTTP_200_OK)
+
+
+@api_view(['GET'])
+@group_required(['EnglishCafe'])
+def student_count(request):
+    try:
+        transaction.set_autocommit(False)
+        count_data = []
+        count_obj = {}
+        if (programmes := Programme.objects.filter(is_deleted=False)).exists():
+
+            for programme in programmes:
+                if (student_profile := StudentProfile.objects.filter(programmes=programme)).exists():
+                    student_profile_programme_count = student_profile.count()
+
+                    count_obj = {
+                        "programme" : programme.name,
+                        "count" : student_profile_programme_count
+                    }
+
+                    count_data.append(count_obj)
+
+                    response_data = {
+                        "StatusCode" : 6000,
+                        "programme" : count_data
+                    }
+
+    except Exception as e:
+        transaction.rollback()
+        errType = e.__class__.__name__
+        errors = {
+            errType: traceback.format_exc()
+        }
+        response_data = {
+            "status": 0,
+            "api": request.get_full_path(),
+            "request": request.data,
+            "message": str(e),
+            "response": errors
+        }
+
+    return Response({'app_data': response_data}, status=status.HTTP_200_OK)
+    
 
 
 

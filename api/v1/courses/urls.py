@@ -22,5 +22,6 @@ urlpatterns = [
     re_path(r'^days-list/(?P<pk>.*)/$',views.days_list_programme, name="list-of-days-in-programme"),
     re_path(r'^add-days/(?P<pk>.*)/$',views.add_days, name="add-days"),
     re_path(r'^add-day/(?P<pk>.*)/$',views.add_day, name="add-day"),
+    re_path(r'^student-count/$',views.student_count, name="student-count"),
 
 ]
