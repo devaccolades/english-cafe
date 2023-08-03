@@ -24,7 +24,6 @@ class StudentProfile(models.Model):
     # Student data
     name = models.CharField(max_length=128, blank=True, null=True)
     phone = models.CharField(max_length=128, blank=True, null=True)
-    # country = models.ForeignKey('general.Country', on_delete=models.CASCADE, blank=True, null=True)
     admission_number = models.CharField(max_length=128, blank=True, null=True)
     is_verified = models.BooleanField(default=False)
     programmes = models.ForeignKey('courses.Programme', on_delete=models.CASCADE, blank=True, null=True)

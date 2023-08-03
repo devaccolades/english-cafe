@@ -111,7 +111,6 @@ def create_student_day_for_new_student(student_data, programme):
     user_pk = student_data["user_pk"]
 
     if Day.objects.filter(programme=programme, is_deleted=False).exists():
-
         day = Day.objects.filter(programme=programme, is_deleted=False).order_by('day_number').first()
         number_of_contents = day.no_of_contents
 
@@ -119,15 +118,17 @@ def create_student_day_for_new_student(student_data, programme):
             student_profile = student_profile.latest("date_added")
 
             if not StudentDay.objects.filter(day=day, student_id=student_id, is_deleted=False).exists():
+
                 student_day = StudentDay.objects.create(
                     auto_id = get_auto_id(StudentDay),
                     day = day,
                     student = student_profile,
                     status = 'ongoing'
                 )
-            
         else:
-            pass
+            pass 
+    else:
+        pass
 
     return True
 

@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from courses.models import *
+from general.encryptions import decrypt 
 
 
 class StudentDayListSerializer(serializers.ModelSerializer):
@@ -52,7 +53,6 @@ class DailyAudioTopicSerializer(serializers.ModelSerializer):
         fields = (
             'id',
             'audio',
-            'text',
             "order_id",
             "is_processed",
             "is_completed",
@@ -254,5 +254,6 @@ class AddProgrammeSerializer(serializers.Serializer):
 
 class AddDaySerializer(serializers.Serializer):
     day_number = serializers.CharField()
+
 
     

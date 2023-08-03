@@ -10,6 +10,7 @@ from rest_framework.permissions import AllowAny, IsAdminUser, IsAuthenticated
 from django.contrib.auth.models import Group, User
 from django.contrib.auth.hashers import make_password
 from django.db import transaction
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 from general.decorators import group_required
 from general.functions import generate_serializer_errors, loginUser, get_first_letters, get_auto_id, create_student_day_for_new_student, create_student_first_topic_for_a_new_student
@@ -259,6 +260,192 @@ def login_student_profile(request):
         }
 
     return Response({'dev_data': response_data}, status=status.HTTP_200_OK)
+
+
+@api_view(['GET'])
+@group_required(['EnglishCafe'])
+def students(request):
+    try:
+        transaction.set_autocommit(False)
+
+        if (students := StudentProfile.objects.filter(is_deleted=False)).exists():
+
+            # Show 20 students per page
+            paginator = Paginator(students, 20)
+            page = request.GET.get('page')
+            try:
+                students = paginator.page(page)
+            except PageNotAnInteger:
+                # If page is not an integer, deliver first page.
+                students = paginator.page(1)
+            except EmptyPage:
+                # If page is out of range (e.g. 9999), deliver last page of results.
+                students = paginator.page(paginator.num_pages)
+
+            next_page_number = 1
+            has_next_page = False
+            if students.has_next():
+                has_next_page = True
+                next_page_number = students.next_page_number()
+
+            has_previous_page = False
+            previous_page_number = 1
+            if students.has_previous():
+                has_previous_page = True
+                previous_page_number = students.previous_page_number()
+
+
+            serialized_data = StudentListSerializer(
+                students,
+                context = {
+                    "request" : request
+                },
+                many=True
+            ).data
+
+            response_data = {
+                "StatusCode" : 6000,
+                "data" : serialized_data,
+                'pagination_data': {
+                    'current_page': students.number,
+                    'has_next_page': has_next_page,
+                    'next_page_number': next_page_number,
+                    'has_previous_page': has_previous_page,
+                    'previous_page_number': previous_page_number,
+                    'total_pages': paginator.num_pages,
+                    'total_items': paginator.count,
+                    'first_item': students.start_index(),
+                    'last_item': students.end_index(),
+                },
+            }
+        else:
+            response_data = {
+                "StatusCode" : 6001,
+                "data" : {
+                    "title" : "Failed",
+                    "message" : "Student not found" 
+                }
+            }
+        return Response({'app_data': response_data}, status=status.HTTP_200_OK)
+    except Exception as e:
+        transaction.rollback()
+        errType = e.__class__.__name__
+        errors = {
+            errType: traceback.format_exc()
+        }
+        response_data = {
+            "status": 0,
+            "api": request.get_full_path(),
+            "request": request.data,
+            "message": str(e),
+            "response": errors
+        }
+
+    return Response({'app_data': response_data}, status=status.HTTP_200_OK)
+
+
+@api_view(['GET'])
+@group_required(['EnglishCafe'])
+def student(request, pk):
+    try:
+        transaction.set_autocommit(False)
+        if (student := StudentProfile.objects.filter(pk=pk, is_deleted=False)).exists():
+            student = student.latest("date_added")
+
+            serialized_data = StudentListSerializer(
+                student,
+                context = {
+                    "request" : request
+                },
+            ).data
+
+            response_data = {
+                "StatusCode" : 6000,
+                "data" : serialized_data
+            }
+        else:
+            response_data = {
+                "StatusCode" : 6001,
+                "data" : {
+                    "title" : "Failed",
+                    "message" : "Student not found"
+                }
+            }
+        return Response({'app_data': response_data}, status=status.HTTP_200_OK)
+    except Exception as e:
+        transaction.rollback()
+        errType = e.__class__.__name__
+        errors = {
+            errType: traceback.format_exc()
+        }
+        response_data = {
+            "status": 0,
+            "api": request.get_full_path(),
+            "request": request.data,
+            "message": str(e),
+            "response": errors
+        }
+
+    return Response({'app_data': response_data}, status=status.HTTP_200_OK)
+
+
+
+@api_view(['POST'])
+@group_required(['EnglishCafe'])
+def edit_students(request,pk):
+    try:
+        transaction.set_autocommit(False)
+
+        name = request.data.get("name")
+        phone = request.data.get("phone")
+        programme_id = request.data.get("programme_id")
+
+        if (student := StudentProfile.objects.filter(pk=pk, is_deleted=False)).exists():
+            student = student.latest("date_added")
+
+            if name:
+                student.name = name
+            if phone:
+                student.phone = phone
+            if programme_id:
+                programme = Programme.objects.get(pk=programme_id, is_deleted=False)
+                student.programmes = programme
+            
+            student.save()
+            transaction.commit()
+
+            response_data = {
+                "StatusCode" : 6000,
+                "data" : {
+                    "title" : "Success",
+                    "message" : "edit completed successfully"
+                }
+            }
+        else:
+            response_data = {
+                "StatusCode" : 6001,
+                "data" : {
+                    "title" : "Failed",
+                    "message" : "Student not found"
+                }
+            }
+
+        return Response({'app_data': response_data}, status=status.HTTP_200_OK)
+    except Exception as e:
+        transaction.rollback()
+        errType = e.__class__.__name__
+        errors = {
+            errType: traceback.format_exc()
+        }
+        response_data = {
+            "status": 0,
+            "api": request.get_full_path(),
+            "request": request.data,
+            "message": str(e),
+            "response": errors
+        }
+
+    return Response({'app_data': response_data}, status=status.HTTP_200_OK)
 
 
 
