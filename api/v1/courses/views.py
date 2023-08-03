@@ -126,7 +126,7 @@ def get_total_days(request):
 
 
 @api_view(['GET'])
-@group_required(['Student'])
+@group_required(['Student','EnglishCafe'])
 def get_daily_topics(request, pk):
     try:
         user =request.user
@@ -144,7 +144,7 @@ def get_daily_topics(request, pk):
 
                 for i in range(int(number_of_contents_in_a_day)):
 
-                    if (daily_audio_topics := DailyAudioTopic.objects.filter(day=day, order_id=int(i+1))).exists():
+                    if (daily_audio_topics := DailyAudioTopic.objects.filter(day=day, order_id=int(i+1), is_deleted=False)).exists():
                         daily_audio_topic_object = daily_audio_topics.latest("date_added")
                         if not temp_data:
                             temp_data.append(daily_audio_topic_object)
@@ -166,7 +166,7 @@ def get_daily_topics(request, pk):
                     else:
                         pass
 
-                    if (daily_video_topics := DailyVideoTopic.objects.filter(day=day, order_id=int(i+1))).exists():
+                    if (daily_video_topics := DailyVideoTopic.objects.filter(day=day, order_id=int(i+1), is_deleted=False)).exists():
                         daily_video_topics_object = daily_video_topics.latest("date_added")
 
                         if not temp_data:
@@ -190,7 +190,7 @@ def get_daily_topics(request, pk):
                     else:
                         pass
 
-                    if (daily_image_topic := DailyImageTopic.objects.filter(day=day, order_id=int(i+1))).exists():
+                    if (daily_image_topic := DailyImageTopic.objects.filter(day=day, order_id=int(i+1), is_deleted=False)).exists():
                         daily_image_topic_objects = daily_image_topic.latest("date_added")
 
                         if not temp_data:
@@ -215,7 +215,7 @@ def get_daily_topics(request, pk):
                         pass
 
 
-                    if (daily_text_topic := DailyTextTopic.objects.filter(day=day, order_id=int(i+1))).exists():
+                    if (daily_text_topic := DailyTextTopic.objects.filter(day=day, order_id=int(i+1), is_deleted=False)).exists():
                         daily_text_topic_object = daily_text_topic.latest("date_added")
 
                         if not temp_data:
@@ -942,8 +942,9 @@ def add_daily_topics(request):
         if serialized_data.is_valid():
             day = request.data["day"]
             topic_type = request.data["topic_type"]
-            file = request.data.get("file")
             order_id = request.data["order_id"]
+            file = request.data.get("file")
+            audio_text = request.data.get("audio_text")
             text = request.data.get("text")
 
             if (day := Day.objects.filter(pk=day, is_deleted=False)).exists():
@@ -954,7 +955,6 @@ def add_daily_topics(request):
                         auto_id = get_auto_id(DailyAudioTopic),
                         day = day,
                         audio = file,
-                        text = text,
                         order_id = order_id,
                     )
 
@@ -964,22 +964,6 @@ def add_daily_topics(request):
                         "data" : {
                             "title" : "Success",
                             "message" : "Daily audio topic updated"
-                        }
-                    }
-                elif topic_type == 'video':
-                    daily_video_topic = DailyVideoTopic.objects.create(
-                        auto_id = get_auto_id(DailyVideoTopic),
-                        day = day,
-                        video = file,
-                        order_id = order_id,
-                    )
-
-                    transaction.commit()
-                    response_data = {
-                        "StatusCode" : 6000,
-                        "data" : {
-                            "title" : "Success",
-                            "message" : "Daily video topic updated"
                         }
                     }
                 elif topic_type == 'text':
@@ -995,7 +979,23 @@ def add_daily_topics(request):
                         "StatusCode" : 6000,
                         "data" : {
                             "title" : "Success",
-                            "message" : "Daily audio text updated"
+                            "message" : "Daily text topic updated"
+                        }
+                    }
+                elif topic_type == 'video':
+                    daily_video_topic = DailyVideoTopic.objects.create(
+                        auto_id = get_auto_id(DailyVideoTopic),
+                        day = day,
+                        video = file,
+                        order_id = order_id
+                    )
+
+                    transaction.commit()
+                    response_data = {
+                        "StatusCode" : 6000,
+                        "data" : {
+                            "title" : "Success",
+                            "message" : "Daily video topic updated"
                         }
                     }
                 elif topic_type == 'image':
@@ -1003,7 +1003,7 @@ def add_daily_topics(request):
                         auto_id = get_auto_id(DailyImageTopic),
                         day = day,
                         daily_image = file,
-                        order_id = order_id,
+                        order_id = order_id
                     )
 
                     transaction.commit()
@@ -1014,6 +1014,7 @@ def add_daily_topics(request):
                             "message" : "Daily image topic updated"
                         }
                     }
+                
                 else:
                     response_data = {
                         "StatusCode" : 6001,
@@ -1042,6 +1043,173 @@ def add_daily_topics(request):
 
         return Response({'app_data': response_data}, status=status.HTTP_200_OK)
         
+    except Exception as e:
+        transaction.rollback()
+        errType = e.__class__.__name__
+        errors = {
+            errType: traceback.format_exc()
+        }
+        response_data = {
+            "status": 0,
+            "api": request.get_full_path(),
+            "request": request.data,
+            "message": str(e),
+            "response": errors
+        }
+
+    return Response({'app_data': response_data}, status=status.HTTP_200_OK)
+
+
+@api_view(['POST'])
+@group_required(['EnglishCafe'])
+def edit_daily_topics(request, pk):
+    try:
+        transaction.set_autocommit(False)
+
+        file = request.data.get("file")
+        text = request.data.get("text")
+        order_id = request.data.get("order_id")
+        
+        if (daily_topics := DailyAudioTopic.objects.filter(pk=pk, is_deleted=False)).exists():
+            daily_topics = daily_topics.latest("date_added")
+
+            if file:
+                daily_topics.audio = file
+            if order_id:
+                daily_topics.order_id = order_id
+            
+            daily_topics.save()
+            transaction.commit()
+            response_data = {
+                "StatusCode" : 6000,
+                "title" : "Success",
+                "message" : "Daily audio topic edited successfully"
+            }
+        elif (daily_topics := DailyTextTopic.objects.filter(pk=pk, is_deleted=False)).exists():
+            daily_topics = daily_topics.latest("date_added")
+
+            if order_id:
+                daily_topics.order_id = order_id
+            if text:
+                daily_topics.daily_text = text
+
+            daily_topics.save()
+            transaction.commit()
+            response_data = {
+                "StatusCode" : 6000,
+                "title" : "Success",
+                "message" : "Daily text topic edited successfully"
+            }
+        elif (daily_topics := DailyImageTopic.objects.filter(pk=pk, is_deleted=False)).exists():
+            daily_topics = daily_topics.latest("date_added")
+
+            if file:
+                daily_topics.daily_image = file
+            if order_id:
+                daily_topics.order_id = order_id
+
+            daily_topics.save()
+            transaction.commit()
+            response_data = {
+                "StatusCode" : 6000,
+                "title" : "Success",
+                "message" : "Daily video image edited successfully"
+            }
+        elif (daily_topics := DailyVideoTopic.objects.filter(pk=pk, is_deleted=False)).exists():
+            daily_topics = daily_topics.latest("date_added")
+
+            if file:
+                daily_topics.video = file
+            if order_id:
+                daily_topics.order_id = order_id
+
+            daily_topics.save()
+            transaction.commit()
+            response_data = {
+                "StatusCode" : 6000,
+                "title" : "Success",
+                "message" : "Daily video topic edited successfully"
+            }
+        else:
+            response_data = {
+                "StatusCode" : 6001,
+                "title" : "Failed",
+                "message" : "Daily topic not found"
+            }
+
+        return Response({'app_data': response_data}, status=status.HTTP_200_OK)
+
+    except Exception as e:
+        transaction.rollback()
+        errType = e.__class__.__name__
+        errors = {
+            errType: traceback.format_exc()
+        }
+        response_data = {
+            "status": 0,
+            "api": request.get_full_path(),
+            "request": request.data,
+            "message": str(e),
+            "response": errors
+        }
+
+    return Response({'app_data': response_data}, status=status.HTTP_200_OK)
+
+
+@api_view(['POST'])
+@group_required(['EnglishCafe'])
+def delete_daily_topics(request, pk):
+    try:
+        
+        if (daily_topics := DailyAudioTopic.objects.filter(pk=pk, is_deleted=False)).exists():
+            daily_topics = daily_topics.latest("date_added")
+            daily_topics.is_deleted = True
+            daily_topics.save()
+            transaction.commit()
+            response_data = {
+                "StatusCode" : 6000,
+                "title" : "Success",
+                "message" : "Daily audio topic deleted successfully"
+            }
+        elif (daily_topics := DailyTextTopic.objects.filter(pk=pk, is_deleted=False)).exists():
+            daily_topics = daily_topics.latest("date_added")
+            daily_topics.is_deleted = True
+            daily_topics.save()
+            transaction.commit()
+            response_data = {
+                "StatusCode" : 6000,
+                "title" : "Success",
+                "message" : "Daily text topic deleted successfully"
+            }
+        elif (daily_topics := DailyImageTopic.objects.filter(pk=pk, is_deleted=False)).exists():
+            daily_topics = daily_topics.latest("date_added")
+            daily_topics.is_deleted = True
+            daily_topics.save()
+            transaction.commit()
+            response_data = {
+                "StatusCode" : 6000,
+                "title" : "Success",
+                "message" : "Daily video image deleted successfully"
+            }
+        elif (daily_topics := DailyVideoTopic.objects.filter(pk=pk, is_deleted=False)).exists():
+            daily_topics = daily_topics.latest("date_added")
+            daily_topics.is_deleted = True
+            daily_topics.save()
+            transaction.commit()
+            response_data = {
+                "StatusCode" : 6000,
+                "title" : "Success",
+                "message" : "Daily video topic deleted successfully"
+            }
+        else:
+            response_data = {
+                "StatusCode" : 6001,
+                "title" : "Failed",
+                "message" : "Daily topic not found"
+            }
+            
+        return Response({'app_data': response_data}, status=status.HTTP_200_OK)
+
     except Exception as e:
         transaction.rollback()
         errType = e.__class__.__name__
@@ -1309,6 +1477,7 @@ def student_count(request):
         }
 
     return Response({'app_data': response_data}, status=status.HTTP_200_OK)
+
     
 
 

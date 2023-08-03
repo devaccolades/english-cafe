@@ -4,6 +4,7 @@ import re
 from django.db import models
 
 from general.models import BaseModel
+from ckeditor.fields import RichTextField
 
 
 STUDENT_DAY_STATUS_CHOICES = (
@@ -82,7 +83,6 @@ class StudentDay(BaseModel):
 class DailyAudioTopic(BaseModel):
     day = models.ForeignKey('courses.Day', on_delete=models.CASCADE, null=True, blank=True)
     audio = models.FileField(upload_to="courses/audio/", null=True, blank=True)
-    text = models.TextField(null=True, blank=True)
     next_topic_id = models.CharField(max_length=255,null=True, blank=True)
     order_id = models.PositiveIntegerField(null=True, blank=True)
 
@@ -147,7 +147,7 @@ class StudentDailyVideoTopic(BaseModel):
 
 class DailyTextTopic(BaseModel):
     day = models.ForeignKey('courses.Day', on_delete=models.CASCADE, null=True, blank=True)
-    daily_text = models.TextField(null=True, blank=True)
+    daily_text = RichTextField()
     next_topic_id = models.CharField(max_length=255,null=True, blank=True)
     order_id = models.PositiveIntegerField( null=True, blank=True)
 

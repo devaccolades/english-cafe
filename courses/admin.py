@@ -15,7 +15,7 @@ admin.site.register(Programme, ProgrammeAdmin)
 admin.site.register(DailyTopics)
 
 class DailyAudioTopicAdmin(admin.ModelAdmin):
-    list_display = ('id', 'day', 'audio', 'text', 'order_id')
+    list_display = ('auto_id','id', 'day', 'audio',  'order_id')
 
 admin.site.register(DailyAudioTopic, DailyAudioTopicAdmin)
 
