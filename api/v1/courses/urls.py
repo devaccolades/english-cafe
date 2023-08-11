@@ -13,11 +13,11 @@ urlpatterns = [
     re_path(r'^daily-topic-complete/(?P<pk>.*)/$',views.daily_topic_complete, name="daily-topic-complete"), 
     re_path(r'^mark-as-complete/(?P<pk>.*)/$',views.mark_as_complete, name="mark-as-complete"),
 
-
     # ===============admin=============================
     re_path(r'^add-programme/$',views.add_programme, name="add-programme"),
     re_path(r'^edit-programme/(?P<pk>.*)/$',views.edit_programme, name="edit-programme"),
     re_path(r'^programme/(?P<pk>.*)/$',views.programme, name="programme"),
+    re_path(r'^delete-programme/(?P<pk>.*)/$',views.delete_programme, name="delete_programme"),
 
     re_path(r'^add-daily-topics/$',views.add_daily_topics, name="add-daily-topics"), 
     re_path(r'^edit-daily-topics/(?P<pk>.*)/$',views.edit_daily_topics, name="edit-daily-topics"), 
