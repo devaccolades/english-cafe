@@ -772,7 +772,7 @@ def add_programme(request):
             description = request.data["description"]
             order_id = request.data["order_id"]
 
-            if not Programme.objects.filter(order_id=order_id).exists():
+            if not Programme.objects.filter(order_id=order_id, is_deleted=False).exists():
 
                 programme = Programme.objects.create(
                     auto_id = get_auto_id(Programme),
