@@ -795,7 +795,7 @@ def add_programme(request):
                     "StatusCode" : 6001,
                     "data" : {
                         "title" : "Failed",
-                        "message" : "Programme already exists"
+                        "message" : "Order id  already exists"
                     }
                 }
         else:
