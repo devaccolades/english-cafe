@@ -1273,41 +1273,53 @@ def delete_daily_topics(request, pk):
 
 @api_view(['GET'])
 @group_required(['EnglishCafe'])
-def days_list_programme(request,pk):
+def days_list_programme(request):
     try:
         transaction.set_autocommit(False)
 
-        if (programme := Programme.objects.filter(pk=pk,is_deleted=False)).exists():
-            programme = programme.latest("date_added")
+        programme_id = request.GET.get("programme_id")
 
-            if (days := Day.objects.filter(programme=programme, is_deleted=False)).exists():
-                days = days.order_by('day_number')
-                serialized_data = AdminDayListSerializer(
-                    days,
-                    context = {
-                        "request" : request
-                    },
-                    many=True
-                ).data
+        if programme_id:
 
-                response_data = {
-                    "StatusCode" : 6000,
-                    "data" : serialized_data
-                }
+            if (programme := Programme.objects.filter(pk=programme_id,is_deleted=False)).exists():
+                programme = programme.latest("date_added")
+
+                if (days := Day.objects.filter(programme=programme, is_deleted=False)).exists():
+                    days = days.order_by('day_number')
+                    serialized_data = AdminDayListSerializer(
+                        days,
+                        context = {
+                            "request" : request
+                        },
+                        many=True
+                    ).data
+
+                    response_data = {
+                        "StatusCode" : 6000,
+                        "data" : serialized_data
+                    }
+                else:
+                    response_data = {
+                        "StatusCode" : 6001,
+                        "data" : {
+                            "title" : "Failed",
+                            "message" : "Day not found"
+                        }
+                    }
             else:
                 response_data = {
                     "StatusCode" : 6001,
-                    "data" : {
+                    "data" :{
                         "title" : "Failed",
-                        "message" : "Day not found"
+                        "message" : "Programme not found"
                     }
                 }
         else:
             response_data = {
                 "StatusCode" : 6001,
-                "data" :{
+                "data" : {
                     "title" : "Failed",
-                    "message" : "Programme not found"
+                    "message" : "Programme id not found"
                 }
             }
         return Response({'app_data': response_data}, status=status.HTTP_200_OK)
