@@ -256,4 +256,8 @@ class AddDaySerializer(serializers.Serializer):
     day_number = serializers.CharField()
 
 
+class AddNumberOfContentSerializer(serializers.Serializer):
+    number_of_content = serializers.CharField()
+
+
     

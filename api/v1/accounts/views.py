@@ -8,6 +8,7 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny, IsAdminUser, IsAuthenticated
 
 from django.contrib.auth.models import Group, User
+from django.db.models import Q
 from django.contrib.auth.hashers import make_password
 from django.db import transaction
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
@@ -267,8 +268,12 @@ def login_student_profile(request):
 def students(request):
     try:
         transaction.set_autocommit(False)
+        q = request.GET.get('q')
 
         if (students := StudentProfile.objects.filter(is_deleted=False)).exists():
+
+            if q:
+                students = StudentProfile.objects.filter(Q(name__icontains=q) | Q(phone__icontains=q) | Q(username__icontains=q), is_deleted=False)
 
             # Show 20 students per page
             paginator = Paginator(students, 20)

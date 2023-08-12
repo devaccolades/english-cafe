@@ -1493,6 +1493,55 @@ def add_day(request, pk):
     return Response({'app_data': response_data}, status=status.HTTP_200_OK)
 
 
+@api_view(['POST'])
+@group_required(['EnglishCafe'])
+def add_number_of_content(request, pk):
+    try:
+        transaction.set_autocommit(False)
+        number_of_content = request.data.get("number_of_content")
+
+        if (day := Day.objects.filter(pk=pk, is_deleted=False)).exists():
+            day = day.latest("id")
+
+            if number_of_content:
+                day.no_of_contents = number_of_content
+
+            day.save()
+            transaction.commit()
+            response_data = {
+                "StatusCode" : 6000,
+                "data" : {
+                    "title" : "Success",
+                    "message" : "number of content added successfully"
+                }
+            }
+
+        else:
+            response_data = {
+                "StatusCode" : 6001,
+                "data" : {
+                    "title" : "Failed",
+                    "message" : "Day not found"
+                }
+            }
+        return Response({'app_data': response_data}, status=status.HTTP_200_OK)
+    except Exception as e:
+        transaction.rollback()
+        errType = e.__class__.__name__
+        errors = {
+            errType: traceback.format_exc()
+        }
+        response_data = {
+            "status": 0,
+            "api": request.get_full_path(),
+            "request": request.data,
+            "message": str(e),
+            "response": errors
+        }
+
+    return Response({'app_data': response_data}, status=status.HTTP_200_OK)
+
+
 @api_view(['GET'])
 @group_required(['EnglishCafe'])
 def student_count(request):
