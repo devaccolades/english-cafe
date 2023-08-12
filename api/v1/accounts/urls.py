@@ -14,6 +14,7 @@ urlpatterns = [
     re_path(r'^get-students/$',views.students, name="student-list"),
     re_path(r'^student/(?P<pk>.*)/$',views.student, name="student-list"),
     re_path(r'^edit-students/(?P<pk>.*)/$',views.edit_students, name="student-edit"),
+    re_path(r'^delete-student/(?P<pk>.*)/$',views.delete_students, name="student-delete"),
 
 
     
