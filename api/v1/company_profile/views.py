@@ -565,7 +565,34 @@ def add_our_team(request):
 def get_our_team(request):
     try:
         transaction.set_autocommit(False)
+        q = request.GET.get("q")
         if (our_teams := OurTeam.objects.filter(is_deleted=False)).exists():
+
+            if q:
+                our_teams = OurTeam.objects.filter(Q(name__icontains=q) | Q(designation__icontains=q), is_deleted=False)
+
+            paginator = Paginator(our_teams, 20)
+            page = request.GET.get('page')
+            try:
+                our_teams = paginator.page(page)
+            except PageNotAnInteger:
+                # If page is not an integer, deliver first page.
+                our_teams = paginator.page(1)
+            except EmptyPage:
+                # If page is out of range (e.g. 9999), deliver last page of results.
+                our_teams = paginator.page(paginator.num_pages)
+
+            next_page_number = 1
+            has_next_page = False
+            if our_teams.has_next():
+                has_next_page = True
+                next_page_number = our_teams.next_page_number()
+
+            has_previous_page = False
+            previous_page_number = 1
+            if our_teams.has_previous():
+                has_previous_page = True
+                previous_page_number = our_teams.previous_page_number()
 
             serialized_data = OurTeamListSerializer(
                 our_teams,
@@ -577,7 +604,18 @@ def get_our_team(request):
 
             response_data = {
                 'StatusCode' : 6000,
-                "data" : serialized_data
+                "data" : serialized_data,
+                'pagination_data': {
+                    'current_page': our_teams.number,
+                    'has_next_page': has_next_page,
+                    'next_page_number': next_page_number,
+                    'has_previous_page': has_previous_page,
+                    'previous_page_number': previous_page_number,
+                    'total_pages': paginator.num_pages,
+                    'total_items': paginator.count,
+                    'first_item': our_teams.start_index(),
+                    'last_item': our_teams.end_index(),
+                },
             }
         else:
             response_data = {
@@ -605,6 +643,63 @@ def get_our_team(request):
         }
 
         return Response({'app_data': response_data}, status=status.HTTP_200_OK)
+    
+
+@api_view(['POST'])
+@group_required(['EnglishCafe'])
+def edit_our_team(request, pk):
+    try:
+        transaction.set_autocommit(False)
+        name = request.data.get("name")
+        photo = request.data.get("photo")
+        designation = request.data.get("designation")
+
+        if (our_team := OurTeam.objects.filter(pk=pk, is_deleted=False)).exists():
+            our_team = our_team.latest("date_added")
+
+            if name:
+                our_team.name = name
+            if photo:
+                our_team.photo = photo
+            if designation:
+                our_team.designation = designation
+
+            our_team.save()
+            transaction.commit()
+
+            response_data = {
+                "StatusCode" : 6000,
+                "data" : {
+                    "title" : "Failed",
+                    "message" : "Edit completed successfully"
+                }
+            }
+        else:
+            response_data = {
+                "StatusCode" : 6001,
+                "data" : {
+                    "title" : "Failed",
+                    "message" : "Our team not found"
+                }
+            }
+        return Response({'app_data': response_data}, status=status.HTTP_200_OK)
+
+    except  Exception as e:
+        transaction.rollback()
+        errType = e.__class__.__name__
+        errors = {
+            errType: traceback.format_exc()
+        }
+        response_data = {
+            "status": 0,
+            "api": request.get_full_path(),
+            "request": request.data,
+            "message": str(e),
+            "response": errors
+        }
+
+        return Response({'app_data': response_data}, status=status.HTTP_200_OK)
+
     
 
 @api_view(['POST'])
