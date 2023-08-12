@@ -453,4 +453,59 @@ def edit_students(request,pk):
     return Response({'app_data': response_data}, status=status.HTTP_200_OK)
 
 
+@api_view(['POST'])
+@group_required(['EnglishCafe'])
+def delete_students(request, pk):
+    try:
+        transaction.set_autocommit(False)
+        if (student_profile := StudentProfile.objects.filter(pk=pk, is_deleted=False)).exists():
+            student_profile = student_profile.latest("date_added")
+            user_pk = student_profile.user.id
+            
+            if (user := User.objects.filter(pk=user_pk)).exists():
+                user = user.latest("id")
+                user.delete()
+                
+                transaction.commit()
+                response_data={
+                    "StatusCode" : 6000,
+                    "data" : {
+                        "title" : "Success",
+                        "message" : "Student profile deleted successfully"
+                    }
+                }
+            else:
+                response_data = {
+                    "StatusCode" : 6001,
+                    "data" : {
+                        "title" : "Failed",
+                        "message" : "An error occured"
+                    }
+                }
+        else:
+            response_data = {
+                "StatusCode" : 6001,
+                "data" : {
+                    "title" : "Failed",
+                    "message" : "Student not found in this pk"
+                }
+            }
+        return Response({'app_data': response_data}, status=status.HTTP_200_OK)
+    except Exception as e:
+        transaction.rollback()
+        errType = e.__class__.__name__
+        errors = {
+            errType: traceback.format_exc()
+        }
+        response_data = {
+            "status": 0,
+            "api": request.get_full_path(),
+            "request": request.data,
+            "message": str(e),
+            "response": errors
+        }
+
+    return Response({'app_data': response_data}, status=status.HTTP_200_OK)
+
+
 
