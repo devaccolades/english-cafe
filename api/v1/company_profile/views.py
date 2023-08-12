@@ -764,7 +764,7 @@ def delete_careers(request, pk):
         if (career :=  Career.objects.filter(pk=pk, is_deleted=False)).exists():
             career = career.latest("date_added")
 
-            career.is_deleted = False
+            career.is_deleted = True
             career.save()
 
             transaction.commit()
