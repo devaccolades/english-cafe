@@ -1,6 +1,8 @@
 import traceback
 
 from django.db import transaction
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.db.models import Q
 
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -851,6 +853,92 @@ def create_career_enquiry(request):
                     "message" : generate_serializer_errors(serialized_data._errors)
                 }
             }
+
+        return Response({'app_data': response_data}, status=status.HTTP_200_OK)
+
+    except  Exception as e:
+        transaction.rollback()
+        errType = e.__class__.__name__
+        errors = {
+            errType: traceback.format_exc()
+        }
+        response_data = {
+            "status": 0,
+            "api": request.get_full_path(),
+            "request": request.data,
+            "message": str(e),
+            "response": errors
+        }
+
+        return Response({'app_data': response_data}, status=status.HTTP_200_OK)
+    
+
+@api_view(['GET'])
+@group_required(['EnglishCafe'])
+def get_career_enquiry(request):
+    try:
+        transaction.set_autocommit(False)
+        q = request.GET.get("q")
+        if (career_enquiries := CareerEnquiry.objects.filter(is_deleted=False)).exists():
+
+            if q:
+                career_enquiries = CareerEnquiry.objects.filter(Q(name__icontains=q) | Q(phone__icontains=q) | Q(job__designation__icontains=q), is_deleted=False)
+
+            paginator = Paginator(career_enquiries, 20)
+            page = request.GET.get('page')
+            try:
+                career_enquiries = paginator.page(page)
+            except PageNotAnInteger:
+                # If page is not an integer, deliver first page.
+                career_enquiries = paginator.page(1)
+            except EmptyPage:
+                # If page is out of range (e.g. 9999), deliver last page of results.
+                career_enquiries = paginator.page(paginator.num_pages)
+
+            next_page_number = 1
+            has_next_page = False
+            if career_enquiries.has_next():
+                has_next_page = True
+                next_page_number = career_enquiries.next_page_number()
+
+            has_previous_page = False
+            previous_page_number = 1
+            if career_enquiries.has_previous():
+                has_previous_page = True
+                previous_page_number = career_enquiries.previous_page_number()
+
+            serialized_data = CareerEnquirySerializer(
+                career_enquiries,
+                context = {
+                    "request" : request
+                },
+                many=True
+            ).data
+
+            response_data = {
+                "StatusCode" : 6000,
+                "data" : serialized_data,
+                'pagination_data': {
+                    'current_page': career_enquiries.number,
+                    'has_next_page': has_next_page,
+                    'next_page_number': next_page_number,
+                    'has_previous_page': has_previous_page,
+                    'previous_page_number': previous_page_number,
+                    'total_pages': paginator.num_pages,
+                    'total_items': paginator.count,
+                    'first_item': career_enquiries.start_index(),
+                    'last_item': career_enquiries.end_index(),
+                },
+            }
+        else:
+            response_data = {
+                "StatusCode" : 6001,
+                "data" : {
+                    "title" : "Failed",
+                    "message" : "Career enquiry not found"
+                }
+            }
+
 
         return Response({'app_data': response_data}, status=status.HTTP_200_OK)
 

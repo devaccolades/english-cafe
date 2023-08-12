@@ -115,3 +115,32 @@ class AddCareerEnquirySerializer(serializers.Serializer):
     phone = serializers.CharField()
     email = serializers.EmailField()
     cv = serializers.FileField()
+
+
+class CareerEnquirySerializer(serializers.ModelSerializer):
+    job = serializers.SerializerMethodField()
+    cv = serializers.SerializerMethodField()
+
+    class Meta:
+        model = CareerEnquiry
+        fields = (
+            'id',
+            'job',
+            'name',
+            'phone',
+            'email',
+            'cv',
+        )
+
+    def get_job(self,instance):
+        if instance.job:
+            return instance.job.designation
+        else:
+            return None
+        
+    def get_cv(self,instance):
+        request = self.context['request']
+        if instance.cv:
+            return request.build_absolute_uri(instance.cv.url)
+        else:
+            return None
