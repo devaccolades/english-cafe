@@ -28,4 +28,6 @@ urlpatterns =[
     re_path(r'^get-careers/$', views.view_careers, name="get_career"),
     re_path(r'^delete-careers/(?P<pk>.*)/$', views.delete_careers, name="delete_career"),
 
+    re_path(r'^get-career-enquiry/$', views.get_career_enquiry, name="get-career-enquiry"),
+
 ]
