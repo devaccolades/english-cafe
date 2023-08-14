@@ -31,5 +31,6 @@ urlpatterns =[
     re_path(r'^delete-careers/(?P<pk>.*)/$', views.delete_careers, name="delete_career"),
 
     re_path(r'^get-career-enquiry/$', views.get_career_enquiry, name="get-career-enquiry"),
+    re_path(r'^send-email/$', views.send_email, name="send-email"),
 
 ]
