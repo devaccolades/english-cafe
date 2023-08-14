@@ -1189,7 +1189,11 @@ def get_career_enquiry(request):
 @group_required(['EnglishCafe'])
 def get_enquiry(request):
     try:
+        q = request.GET.get("q")
         if (enquiry := Enquiry.objects.filter(is_deleted=False)).exists():
+
+            if q:
+                enquiry = Enquiry.objects.filter(Q(name__icontains=q) | Q(phone__icontains=q),is_deleted=False)
            
             paginator = Paginator(enquiry, 20)
             page = request.GET.get('page')
@@ -1237,7 +1241,7 @@ def get_enquiry(request):
                     'last_item': enquiry.end_index(),
                 },
             }
-            
+
         else:
             response_data = {
                 "StatusCode" : 6001,
