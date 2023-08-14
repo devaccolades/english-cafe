@@ -43,6 +43,7 @@ class TestimonialListSerializer(serializers.ModelSerializer):
         fields = (
             'id',
             'name',
+            'quote',
             'rating_count',
             'image',
             'video',
