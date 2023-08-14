@@ -308,7 +308,34 @@ def add_testimonials(request):
 def view_testimonials(request):
     try:
         transaction.set_autocommit(False)
+        q = request.GET.get("q")
         if (testimonials := Testimonials.objects.filter(is_deleted=False)).exists():
+
+            if q:
+                testimonials = Testimonials.objects.filter(name__icontains=q , is_deleted=False)
+
+            paginator = Paginator(testimonials, 20)
+            page = request.GET.get('page')
+            try:
+                testimonials = paginator.page(page)
+            except PageNotAnInteger:
+                # If page is not an integer, deliver first page.
+                testimonials = paginator.page(1)
+            except EmptyPage:
+                # If page is out of range (e.g. 9999), deliver last page of results.
+                testimonials = paginator.page(paginator.num_pages)
+
+            next_page_number = 1
+            has_next_page = False
+            if testimonials.has_next():
+                has_next_page = True
+                next_page_number = testimonials.next_page_number()
+
+            has_previous_page = False
+            previous_page_number = 1
+            if testimonials.has_previous():
+                has_previous_page = True
+                previous_page_number = testimonials.previous_page_number()
 
             serialized_data = TestimonialListSerializer(
                 testimonials,
@@ -321,7 +348,18 @@ def view_testimonials(request):
             transaction.commit()
             response_data = {
                 "StatusCode" : 6000,
-                "data" : serialized_data
+                "data" : serialized_data,
+                'pagination_data': {
+                    'current_page': testimonials.number,
+                    'has_next_page': has_next_page,
+                    'next_page_number': next_page_number,
+                    'has_previous_page': has_previous_page,
+                    'previous_page_number': previous_page_number,
+                    'total_pages': paginator.num_pages,
+                    'total_items': paginator.count,
+                    'first_item': testimonials.start_index(),
+                    'last_item': testimonials.end_index(),
+                },
             }
         else:
             response_data = { 
