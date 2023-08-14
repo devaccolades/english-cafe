@@ -22,6 +22,7 @@ urlpatterns =[
 
     re_path(r'^add-our-team/$', views.add_our_team, name="add-our-team"),
     re_path(r'^get-our-team/$', views.get_our_team, name="get-our-team"),
+    re_path(r'^edit-our-team/(?P<pk>.*)/$', views.edit_our_team, name="edit-our-team"),
     re_path(r'^delete-our-team/(?P<pk>.*)/$', views.delete_our_team, name="delete-our-team"),
 
     re_path(r'^add-careers/$', views.add_careers, name="add_career"),
