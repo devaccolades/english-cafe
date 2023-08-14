@@ -30,3 +30,9 @@ class CareerEnquiryAdmin(admin.ModelAdmin):
     list_display = ('id', 'job','name', 'phone', 'email', 'cv')
 
 admin.site.register(CareerEnquiry, CareerEnquiryAdmin)
+
+
+class EnquiryAdmin(admin.ModelAdmin):
+    list_display = ('id', 'name', 'phone', 'email', 'message')
+
+admin.site.register(Enquiry, EnquiryAdmin)

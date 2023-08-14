@@ -13,6 +13,7 @@ urlpatterns =[
     re_path(r'^achievements/$', views.achievements_view, name="list-achievement"),
     re_path(r'^edit-achievement/(?P<pk>.*)/$', views.edit_achievements, name="edit-achievement"),
     re_path(r'^achievement/(?P<pk>.*)/$', views.single_achievements, name="single-achievement"),
+    re_path(r'^delete-achievement/(?P<pk>.*)/$', views.delete_achievements, name="delete-achievement"),
 
     re_path(r'^add-testimonials/$', views.add_testimonials, name="add-testimonials"),
     re_path(r'^testimonials/$', views.view_testimonials, name="list-testimonials"),
@@ -31,6 +32,7 @@ urlpatterns =[
     re_path(r'^delete-careers/(?P<pk>.*)/$', views.delete_careers, name="delete_career"),
 
     re_path(r'^get-career-enquiry/$', views.get_career_enquiry, name="get-career-enquiry"),
+    re_path(r'^get-enquiry/$', views.get_enquiry, name="get-enquiry"),
     re_path(r'^send-email/$', views.send_email, name="send-email"),
 
 ]
