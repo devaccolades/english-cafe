@@ -3,6 +3,8 @@ import traceback
 from django.db import transaction
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.db.models import Q
+from django.template.loader import render_to_string
+from django.conf import settings
 
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -11,7 +13,7 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
 
 from general.decorators import group_required
-from general.functions import generate_serializer_errors, get_auto_id
+from general.functions import generate_serializer_errors, get_auto_id, send_emails
 from api.v1.company_profile.serializers import *
 from company_profile.models import *
 
@@ -1101,7 +1103,38 @@ def get_career_enquiry(request):
         return Response({'app_data': response_data}, status=status.HTTP_200_OK)
     
 
+@api_view(['POST'])
+def send_email(request):
+    name = "Shyam"
+    email = "shyamkp98@gmail.com"
+    phone = 8921924446
+    
 
+    subject = "Request for Enquiry"
+    content = "Request for Enquiry"
+
+    context = {
+        "request" : request,
+        'email' : email,
+        'name' :name,
+        'phone' : phone,
+        'email' : email,
+        "subject" : subject,
+        "content" : content,
+        'mail_title' : "Enquiry Details",
+    }
+    template_name = 'enquiry.html'
+    html_content = render_to_string(template_name, context)
+    try:
+        send_emails(email, subject, content, html_content)
+    except Exception as e:
+        print(str(e),"=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=")
+
+    response_data = {
+        "StatusCode" : 6000, 
+    }
+
+    return Response({'app_data': response_data}, status=status.HTTP_200_OK)
 
     
 
