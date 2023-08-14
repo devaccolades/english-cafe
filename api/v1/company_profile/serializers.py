@@ -145,3 +145,16 @@ class CareerEnquirySerializer(serializers.ModelSerializer):
             return request.build_absolute_uri(instance.cv.url)
         else:
             return None
+        
+    
+class EnquiryListSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Enquiry
+        fields = (
+            'id',
+            'name',
+            'phone',
+            'email',
+            'message'
+        )

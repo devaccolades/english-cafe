@@ -95,7 +95,19 @@ class CareerEnquiry(BaseModel):
 
     def __str__(self):
         return self.name
-       
+    
 
+class Enquiry(BaseModel):
+    name = models.CharField(max_length=255, null=True, blank=True)
+    phone = models.CharField(max_length=255, null=True, blank=True)
+    email = models.EmailField(null=True, blank=True)
+    message = models.TextField(max_length=255, null=True, blank=True)
 
+    class Meta:
+        db_table = 'company_profile__enquiry'
+        verbose_name = (' Enquiry')
+        verbose_name_plural = ('Enquiries')
+        ordering = ('id',)
 
+    def __str__(self):
+        return self.name
