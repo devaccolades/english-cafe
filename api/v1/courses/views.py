@@ -385,8 +385,20 @@ def get_admin_daily_topics(request, pk):
             }
        
         return Response({'app_data': response_data}, status=status.HTTP_200_OK)
-    except Exception as E:
-        return Response({'app_data': 'something went wrong', 'dev_data': str(E)}, status=status.HTTP_400_BAD_REQUEST)
+    except Exception as e:
+        transaction.rollback()
+        errType = e.__class__.__name__
+        errors = {
+            errType: traceback.format_exc()
+        }
+        response_data = {
+            "status": 0,
+            "api": request.get_full_path(),
+            "request": request.data,
+            "message": str(e),
+            "response": errors
+        }
+        return Response({'app_data': response_data}, status=status.HTTP_200_OK)
 
     
 
@@ -1229,6 +1241,99 @@ def add_daily_topics(request):
         }
 
     return Response({'app_data': response_data}, status=status.HTTP_200_OK)
+
+
+@api_view(['GET'])
+@group_required(['EnglishCafe'])
+def single_topic(request, pk):
+    try:
+        if (daily_audio_topics := DailyAudioTopic.objects.filter(pk=pk,  is_deleted=False)).exists():
+            daily_audio_topics = daily_audio_topics.latest("date_added")
+            
+            serialized_data = DailyAdminAudioTopicSerializer(
+                daily_audio_topics,
+                context = {
+                    "request" : request,
+                },
+            ).data
+
+            response_data = {
+                "StatusCode" : 6000,
+                "data" : serialized_data
+            }
+
+
+        elif (daily_video_topics := DailyVideoTopic.objects.filter(pk=pk, is_deleted=False)).exists():
+            daily_video_topics = daily_video_topics.latest("date_added")
+
+            serialized_data = DailyAdminVideoTopicSerializer(
+                daily_video_topics,
+                context = {
+                    "request" : request,
+                },
+            ).data
+
+            response_data = {
+                "StatusCode" : 6000,
+                "data" : serialized_data
+            }
+
+
+        elif (daily_image_topic := DailyImageTopic.objects.filter(pk=pk, is_deleted=False)).exists():
+            daily_image_topic = daily_image_topic.latest("date_added")
+
+            serialized_data = DailyAdminImageTopicSerializer(
+                daily_image_topic,
+                context = {
+                    "request" : request,
+                },
+            ).data
+
+            response_data = {
+                "StatusCode" : 6000,
+                "data" : serialized_data
+            }
+
+        elif (daily_text_topic := DailyTextTopic.objects.filter(pk=pk, is_deleted=False)).exists():
+            daily_text_topic = daily_text_topic.latest("date_added")
+
+            serialized_data = DailyAdminTextSerializer(
+                daily_text_topic,
+                context = {
+                    "request" : request,
+                },
+            ).data
+        
+            response_data = {
+                "StatusCode" : 6000,
+                "data" : serialized_data
+            }
+        
+        else:
+            response_data = {
+                "StatusCode" : 6001,
+                "data" : {
+                    "title" : "Failed",
+                    "message" : "Daily topic not found"
+                }
+            }
+            
+    except Exception as e:
+        transaction.rollback()
+        errType = e.__class__.__name__
+        errors = {
+            errType: traceback.format_exc()
+        }
+        response_data = {
+            "status": 0,
+            "api": request.get_full_path(),
+            "request": request.data,
+            "message": str(e),
+            "response": errors
+        }
+
+    return Response({'app_data': response_data}, status=status.HTTP_200_OK)
+
 
 
 @api_view(['POST'])

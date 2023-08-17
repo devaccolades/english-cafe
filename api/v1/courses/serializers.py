@@ -268,7 +268,6 @@ class DailyAdminAudioTopicSerializer(serializers.ModelSerializer):
             'id',
             'audio',
             "order_id",
-            "next_topic_id"
         )
     
     
@@ -280,7 +279,6 @@ class DailyAdminImageTopicSerializer(serializers.ModelSerializer):
             "id",
             "daily_image",
             "order_id",
-            "next_topic_id"
         )
     
     
@@ -292,7 +290,6 @@ class DailyAdminVideoTopicSerializer(serializers.ModelSerializer):
             'id',
             'video',
             "order_id",
-            "next_topic_id"
         )
     
     
@@ -304,7 +301,6 @@ class DailyAdminTextSerializer(serializers.ModelSerializer):
             'id',
             'daily_text',
             "order_id",
-            "next_topic_id",
         )
 
     
