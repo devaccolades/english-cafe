@@ -14,6 +14,8 @@ urlpatterns = [
     re_path(r'^mark-as-complete/(?P<pk>.*)/$',views.mark_as_complete, name="mark-as-complete"),
 
     # ===============admin=============================
+    re_path(r'^get-admin-daily-topics/(?P<pk>.*)/$',views.get_admin_daily_topics, name="admin-daily-topics"),
+
     re_path(r'^add-programme/$',views.add_programme, name="add-programme"),
     re_path(r'^edit-programme/(?P<pk>.*)/$',views.edit_programme, name="edit-programme"),
     re_path(r'^programme/(?P<pk>.*)/$',views.programme, name="programme"),
