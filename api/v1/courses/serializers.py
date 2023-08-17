@@ -260,4 +260,54 @@ class AddNumberOfContentSerializer(serializers.Serializer):
     number_of_content = serializers.CharField()
 
 
+class DailyAdminAudioTopicSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = DailyAudioTopic
+        fields = (
+            'id',
+            'audio',
+            "order_id",
+            "next_topic_id"
+        )
+    
+    
+class DailyAdminImageTopicSerializer(serializers.ModelSerializer):
+   
+    class Meta:
+        model = DailyImageTopic
+        fields = (
+            "id",
+            "daily_image",
+            "order_id",
+            "next_topic_id"
+        )
+    
+    
+class DailyAdminVideoTopicSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = DailyVideoTopic
+        fields = (
+            'id',
+            'video',
+            "order_id",
+            "next_topic_id"
+        )
+    
+    
+class DailyAdminTextSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = DailyTextTopic
+        fields = (
+            'id',
+            'daily_text',
+            "order_id",
+            "next_topic_id",
+        )
+
+    
+
+
     

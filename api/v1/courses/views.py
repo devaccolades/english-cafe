@@ -263,6 +263,133 @@ def get_daily_topics(request, pk):
         return Response({'app_data': 'something went wrong', 'dev_data': str(E)}, status=status.HTTP_400_BAD_REQUEST)
     
 
+@api_view(['GET'])
+@group_required(['EnglishCafe'])
+def get_admin_daily_topics(request, pk):
+    try:
+        if (day := Day.objects.filter(pk=pk, is_deleted=False)).exists():
+            day = day.latest("id")
+
+            number_of_contents_in_a_day = day.no_of_contents
+
+            topics =[]
+            temp_data = []
+
+            for i in range(int(number_of_contents_in_a_day)):
+
+                if (daily_audio_topics := DailyAudioTopic.objects.filter(day=day, order_id=int(i+1), is_deleted=False)).exists():
+                    daily_audio_topic_object = daily_audio_topics.latest("date_added")
+                    if not temp_data:
+                        temp_data.append(daily_audio_topic_object)
+                    else:
+                        temp_data[-1].next_topic_id = daily_audio_topic_object.id
+                        temp_data[-1].save()
+                        temp_data.append(daily_audio_topic_object)
+
+                    audio_serialized_data = DailyAdminAudioTopicSerializer(
+                        daily_audio_topics,
+                        context = {
+                            "request" : request,
+                            # "student_id" : student,
+                        },
+                        many=True
+                    ).data
+                    audio_serialized_data[0]['type'] = "audio"
+                    topics.append(audio_serialized_data[0])
+                else:
+                    pass
+
+                if (daily_video_topics := DailyVideoTopic.objects.filter(day=day, order_id=int(i+1), is_deleted=False)).exists():
+                    daily_video_topics_object = daily_video_topics.latest("date_added")
+
+                    if not temp_data:
+                        temp_data.append(daily_video_topics_object)
+                    else:
+                        temp_data[-1].next_topic_id = daily_video_topics_object.id
+                        temp_data[-1].save()
+                        temp_data.append(daily_video_topics_object)
+
+                    video_serialized_data = DailyAdminVideoTopicSerializer(
+                        daily_video_topics,
+                        context = {
+                            "request" : request,
+                            # "student_id" : student,
+                        },
+                        many=True
+                    ).data
+
+                    video_serialized_data[0]["type"] = "video"
+                    topics.append(video_serialized_data[0])
+                else:
+                    pass
+
+                if (daily_image_topic := DailyImageTopic.objects.filter(day=day, order_id=int(i+1), is_deleted=False)).exists():
+                    daily_image_topic_objects = daily_image_topic.latest("date_added")
+
+                    if not temp_data:
+                        temp_data.append(daily_image_topic_objects)
+                    else:
+                        temp_data[-1].next_topic_id = daily_image_topic_objects.id
+                        temp_data[-1].save()
+                        temp_data.append(daily_image_topic_objects)
+
+                    image_serialized_data = DailyAdminImageTopicSerializer(
+                        daily_image_topic,
+                        context = {
+                            "request" : request,
+                            # "student_id" : student,
+                        },
+                        many=True
+                    ).data
+
+                    image_serialized_data[0]["type"] = "image"
+                    topics.append(image_serialized_data[0])
+                else:
+                    pass
+
+
+                if (daily_text_topic := DailyTextTopic.objects.filter(day=day, order_id=int(i+1), is_deleted=False)).exists():
+                    daily_text_topic_object = daily_text_topic.latest("date_added")
+
+                    if not temp_data:
+                        temp_data.append(daily_text_topic_object)
+                    else:
+                        temp_data[-1].next_topic_id = daily_text_topic_object.id
+                        temp_data[-1].save()
+                        temp_data.append(daily_text_topic_object)
+
+                    text_serialized_data = DailyAdminTextSerializer(
+                        daily_text_topic,
+                        context = {
+                            "request" : request,
+                            # "student_id" : student,
+                        },
+                        many=True
+                    ).data
+
+                    text_serialized_data[0]["type"] = "text"
+                    topics.append(text_serialized_data[0])
+
+            response_data = {
+                "StatusCode" : 6000,
+                "data" : topics
+            }
+            
+        else:
+            response_data = {
+                "StatusCode" : 6001,
+                "data" : {
+                    "title" : "Failed",
+                    "message" : "Day not found"
+                }
+            }
+       
+        return Response({'app_data': response_data}, status=status.HTTP_200_OK)
+    except Exception as E:
+        return Response({'app_data': 'something went wrong', 'dev_data': str(E)}, status=status.HTTP_400_BAD_REQUEST)
+
+    
+
 @api_view(['POST'])
 @group_required(['Student'])
 def daily_topic_complete(request, pk):
