@@ -277,22 +277,26 @@ def assing_first_topic_of_a_day(student_data, programme, day_number):
 
 
 def send_emails(to_address, subject, content, html_content, attachment=None, attachment2=None, attachment3=None, bcc_address=None):
-    new_message = MailerMessage()
-    new_message.subject = subject
-    new_message.to_address = to_address
-    if bcc_address:
-        new_message.bcc_address = bcc_address
-    new_message.from_address = "Accolades Private Limites"
-    new_message.content = content
-    new_message.html_content = html_content
-    if attachment:
-        new_message.add_attachment(attachment)
-    if attachment2:
-        new_message.add_attachment(attachment2)
-    if attachment3:
-        new_message.add_attachment(attachment3)
-    new_message.app = "default"
-    new_message.save()
+    try:
+        new_message = MailerMessage()
+        new_message.subject = subject
+        new_message.to_address = to_address
+        if bcc_address:
+            new_message.bcc_address = bcc_address
+        new_message.from_address = "Accolades Private Limites"
+        new_message.content = content
+        new_message.html_content = html_content
+        if attachment:
+            new_message.add_attachment(attachment)
+        if attachment2:
+            new_message.add_attachment(attachment2)
+        if attachment3:
+            new_message.add_attachment(attachment3)
+        new_message.app = "default"
+        print(new_message,"=-=-=-=-=-=-=-=-=-=-=-=-=-new_message")
+        new_message.save()
+    except Exception as e:
+        print(str(e), "=-==-=-=-=-=-=-=-=-=-")
             
 
 

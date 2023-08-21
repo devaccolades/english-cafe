@@ -33,6 +33,6 @@ urlpatterns =[
 
     re_path(r'^get-career-enquiry/$', views.get_career_enquiry, name="get-career-enquiry"),
     re_path(r'^get-enquiry/$', views.get_enquiry, name="get-enquiry"),
-    re_path(r'^send-email/$', views.send_email, name="send-email"),
+    re_path(r'^create-enquiry-email/$', views.create_enquiry, name="send-email"),
 
 ]
