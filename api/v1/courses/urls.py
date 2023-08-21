@@ -30,6 +30,7 @@ urlpatterns = [
     re_path(r'^add-days/(?P<pk>.*)/$',views.add_days, name="add-days"),
     re_path(r'^add-day/(?P<pk>.*)/$',views.add_day, name="add-day"),
     re_path(r'^add-number-of-content-in-a-day/(?P<pk>.*)/$',views.add_number_of_content, name="add-day"),
+    re_path(r'^number-of-content-in-a-day/(?P<pk>.*)/$',views.number_of_content, name="number-of-content-in-a-day"),
     re_path(r'^student-count/$',views.student_count, name="student-count"),
 
 
