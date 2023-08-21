@@ -1270,37 +1270,116 @@ def get_enquiry(request):
     
 
 @api_view(['POST'])
-def send_email(request):
-    name = "Shyam"
-    email = "shyamkp98@gmail.com"
-    phone = 8921924446
-    
-
-    subject = "Request for Enquiry"
-    content = "Request for Enquiry"
-
-    context = {
-        "request" : request,
-        'email' : email,
-        'name' :name,
-        'phone' : phone,
-        'email' : email,
-        "subject" : subject,
-        "content" : content,
-        'mail_title' : "Enquiry Details",
-    }
-    template_name = 'enquiry.html'
-    html_content = render_to_string(template_name, context)
+def create_enquiry(request):
     try:
-        send_emails(email, subject, content, html_content)
-    except Exception as e:
-        print(str(e),"=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=")
+        transaction.set_autocommit(False)
+        serialized_data = CreateEnquirySerializer(data=request.data)
+        if serialized_data.is_valid():
+            name = request.data["name"]
+            phone = request.data["phone"]
+            email = request.data["email"]
+            message = request.data["message"]
 
-    response_data = {
-        "StatusCode" : 6000, 
-    }
+            if not Enquiry.objects.filter(name=name, phone=phone, email=email, message=message).exists():
+                enquiry = Enquiry.objects.create(
+                    auto_id = get_auto_id(Enquiry),
+                    name = name,
+                    phone = phone,
+                    email = email,
+                    message = message
+                )
+
+                subject = "Request for Enquiry"
+                content = "Request for Enquiry"
+
+                host_email = settings.EMAIL_HOST_USER
+                context = {
+                    "request" : request,
+                    'email' : email,
+                    'name' :name,
+                    'phone' : phone,
+                    'email' : email,
+                    "message" : message,
+                    "subject" : subject,
+                    "content" : content,
+                    'mail_title' : "Enquiry Details",
+                }
+                template_name = 'enquiry.html'
+                html_content = render_to_string(template_name, context)
+                try:
+                    send_emails(host_email, subject, content, html_content)
+                except Exception as e:
+                    print("Helllllllllooooooo=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=")
+
+                response_data = {
+                    "StatusCode" : 6000,
+                    "data" : {
+                        "title" : "Success",
+                        "message" : "Enquiry submitted successfully"
+                    }
+                }
+            else:
+                response_data = {
+                    "StatusCode" : 6001,
+                    "data" : {
+                        "title" : "Failed",
+                        "message" : "Already you have submitted the enquiry"
+                    }
+                }
+        else:
+            response_data = {
+                "StatusCode" : 6001,
+                "data" : {
+                    "title" : "Failed",
+                    "message" : generate_serializer_errors(serialized_data._errors)
+                }
+            }
+    except  Exception as e:
+        transaction.rollback()
+        errType = e.__class__.__name__
+        errors = {
+            errType: traceback.format_exc()
+        }
+        response_data = {
+            "status": 0,
+            "api": request.get_full_path(),
+            "request": request.data,
+            "message": str(e),
+            "response": errors
+        }
 
     return Response({'app_data': response_data}, status=status.HTTP_200_OK)
+
+    # name = "Shyam"
+    # email = "shyamkp98@gmail.com"
+    # phone = 8921924446
+    
+
+    # subject = "Request for Enquiry"
+    # content = "Request for Enquiry"
+
+    # context = {
+    #     "request" : request,
+    #     'email' : email,
+    #     'name' :name,
+    #     'phone' : phone,
+    #     'email' : email,
+    #     "subject" : subject,
+    #     "content" : content,
+    #     'mail_title' : "Enquiry Details",
+    # }
+    # template_name = 'enquiry.html'
+    # html_content = render_to_string(template_name, context)
+    # try:
+    #     send_emails(email, subject, content, html_content)
+    # except Exception as e:
+    #     print(str(e),"=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=")
+
+    # response_data = {
+    #     "StatusCode" : 6000, 
+    # }
+
+    # return Response({'app_data': response_data}, status=status.HTTP_200_OK)
 
     
 

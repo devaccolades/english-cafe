@@ -158,3 +158,10 @@ class EnquiryListSerializer(serializers.ModelSerializer):
             'email',
             'message'
         )
+
+
+class CreateEnquirySerializer(serializers.Serializer):
+    name = serializers.CharField()
+    phone = serializers.CharField()
+    email = serializers.CharField()
+    message = serializers.CharField()
