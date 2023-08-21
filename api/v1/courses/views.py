@@ -1133,80 +1133,89 @@ def add_daily_topics(request):
             if (day := Day.objects.filter(pk=day, is_deleted=False)).exists():
                 day = day.latest("id")
 
-                if topic_type == 'audio':
-                    daily_audio_topic = DailyAudioTopic.objects.create(
-                        auto_id = get_auto_id(DailyAudioTopic),
-                        day = day,
-                        audio = file,
-                        order_id = order_id,
-                    )
+                if day.no_of_contents:
 
-                    transaction.commit()
-                    response_data = {
-                        "StatusCode" : 6000,
-                        "data" : {
-                            "title" : "Success",
-                            "message" : "Daily audio topic updated"
-                        }
-                    }
-                elif topic_type == 'text':
-                    daily_text_topic = DailyTextTopic.objects.create(
-                        auto_id = get_auto_id(DailyTextTopic),
-                        day = day,
-                        daily_text = text,
-                        order_id = order_id
-                    )
+                    if topic_type == 'audio':
+                        daily_audio_topic = DailyAudioTopic.objects.create(
+                            auto_id = get_auto_id(DailyAudioTopic),
+                            day = day,
+                            audio = file,
+                            order_id = order_id,
+                        )
 
-                    transaction.commit()
-                    response_data = {
-                        "StatusCode" : 6000,
-                        "data" : {
-                            "title" : "Success",
-                            "message" : "Daily text topic updated"
+                        transaction.commit()
+                        response_data = {
+                            "StatusCode" : 6000,
+                            "data" : {
+                                "title" : "Success",
+                                "message" : "Daily audio topic updated"
+                            }
                         }
-                    }
-                elif topic_type == 'video':
-                    daily_video_topic = DailyVideoTopic.objects.create(
-                        auto_id = get_auto_id(DailyVideoTopic),
-                        day = day,
-                        video = file,
-                        order_id = order_id
-                    )
+                    elif topic_type == 'text':
+                        daily_text_topic = DailyTextTopic.objects.create(
+                            auto_id = get_auto_id(DailyTextTopic),
+                            day = day,
+                            daily_text = text,
+                            order_id = order_id
+                        )
 
-                    transaction.commit()
-                    response_data = {
-                        "StatusCode" : 6000,
-                        "data" : {
-                            "title" : "Success",
-                            "message" : "Daily video topic updated"
+                        transaction.commit()
+                        response_data = {
+                            "StatusCode" : 6000,
+                            "data" : {
+                                "title" : "Success",
+                                "message" : "Daily text topic updated"
+                            }
                         }
-                    }
-                elif topic_type == 'image':
-                    daily_image_topic = DailyImageTopic.objects.create(
-                        auto_id = get_auto_id(DailyImageTopic),
-                        day = day,
-                        daily_image = file,
-                        order_id = order_id
-                    )
+                    elif topic_type == 'video':
+                        daily_video_topic = DailyVideoTopic.objects.create(
+                            auto_id = get_auto_id(DailyVideoTopic),
+                            day = day,
+                            video = file,
+                            order_id = order_id
+                        )
 
-                    transaction.commit()
-                    response_data = {
-                        "StatusCode" : 6000,
-                        "data" : {
-                            "title" : "Success",
-                            "message" : "Daily image topic updated"
+                        transaction.commit()
+                        response_data = {
+                            "StatusCode" : 6000,
+                            "data" : {
+                                "title" : "Success",
+                                "message" : "Daily video topic updated"
+                            }
                         }
-                    }
-                
+                    elif topic_type == 'image':
+                        daily_image_topic = DailyImageTopic.objects.create(
+                            auto_id = get_auto_id(DailyImageTopic),
+                            day = day,
+                            daily_image = file,
+                            order_id = order_id
+                        )
+
+                        transaction.commit()
+                        response_data = {
+                            "StatusCode" : 6000,
+                            "data" : {
+                                "title" : "Success",
+                                "message" : "Daily image topic updated"
+                            }
+                        }
+                    
+                    else:
+                        response_data = {
+                            "StatusCode" : 6001,
+                            "data" : {
+                                "title" : "Failed",
+                                "message" : "Topic type not found"
+                            }
+                        }
                 else:
                     response_data = {
                         "StatusCode" : 6001,
                         "data" : {
                             "title" : "Failed",
-                            "message" : "Topic type not found"
+                            "message" : "No of content not found"
                         }
                     }
-
             else:
                 response_data = {
                     "StatusCode" : 6001,
