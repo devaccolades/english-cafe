@@ -7,6 +7,7 @@ app_name = "api_v1_company_profile"
 urlpatterns =[
     # =================user==================
     re_path(r'^create-career-enquiry/$', views.create_career_enquiry, name="add-career-enquiry"),
+    re_path(r'^company-count-data/$', views.company_count_data, name="company-count-data"),
 
     # ================admin================
     re_path(r'^add-achievement/$', views.add_achievement, name="add-achievement"),

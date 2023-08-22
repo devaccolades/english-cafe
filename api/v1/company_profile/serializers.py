@@ -165,3 +165,16 @@ class CreateEnquirySerializer(serializers.Serializer):
     phone = serializers.CharField()
     email = serializers.CharField()
     message = serializers.CharField()
+
+
+class CompanyCountListSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = CompanyCount
+        fields = (
+            'id',
+            'successfull_students',
+            'languages_trainee',
+            'awards_won',
+            'courses'
+        )
