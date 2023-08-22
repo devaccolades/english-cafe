@@ -17,7 +17,7 @@ from api.v1.courses.functions import assign_next_topic
 
 
 @api_view(['GET'])
-@group_required(['EnglishCafe'])
+@permission_classes([AllowAny,])
 def programme_list(request):
     try:
         transaction.set_autocommit(False)

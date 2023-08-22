@@ -83,7 +83,7 @@ def add_achievement(request):
 
 
 @api_view(['GET'])
-@group_required(['EnglishCafe', 'Student',])
+@permission_classes([AllowAny,])
 def achievements_view(request):
     try:
         transaction.set_autocommit(False)
@@ -937,7 +937,7 @@ def add_careers(request):
     
 
 @api_view(['GET'])
-@group_required(['EnglishCafe', 'Student'])
+@permission_classes([AllowAny,])
 def view_careers(request):
     try:
         transaction.set_autocommit(False)
@@ -1032,7 +1032,7 @@ def delete_careers(request, pk):
     
 
 @api_view(['POST'])
-@group_required(['Student'])
+@permission_classes([AllowAny,])
 def create_career_enquiry(request):
     try:
         transaction.set_autocommit(False)
@@ -1100,7 +1100,7 @@ def create_career_enquiry(request):
     
 
 @api_view(['GET'])
-@group_required(['Student', 'EnglishCafe'])
+@permission_classes([AllowAny,])
 def company_count_data(request):
     try:
         if (company_count := CompanyCount.objects.filter(is_deleted=False)).exists():
@@ -1314,6 +1314,7 @@ def get_enquiry(request):
     
 
 @api_view(['POST'])
+@permission_classes([AllowAny,])
 def create_enquiry(request):
     try:
         transaction.set_autocommit(False)
