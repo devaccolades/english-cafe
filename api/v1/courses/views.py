@@ -1782,6 +1782,45 @@ def add_number_of_content(request, pk):
 
     return Response({'app_data': response_data}, status=status.HTTP_200_OK)
 
+@api_view(['GET'])
+@group_required(['EnglishCafe'])
+def number_of_content(request, pk):
+    try:
+        if (day := Day.objects.filter(pk=pk, is_deleted=False)).exists():
+            day = day.latest("id")
+            if day.no_of_contents:
+                number_of_content = int(day.no_of_contents)
+            else:
+                number_of_content = 0
+            
+            response_data = {
+                "StatusCode" : 6000,
+                "number_of_content" : number_of_content
+            }
+        else:
+            response_data = {
+                "StatusCode" : 6001,
+                "data" : {
+                    "title" : "Failed",
+                    "message" : "Day not found"             
+                }
+            }
+    except Exception as e:
+        transaction.rollback()
+        errType = e.__class__.__name__
+        errors = {
+            errType: traceback.format_exc()
+        }
+        response_data = {
+            "status": 0,
+            "api": request.get_full_path(),
+            "request": request.data,
+            "message": str(e),
+            "response": errors
+        }
+
+    return Response({'app_data': response_data}, status=status.HTTP_200_OK)
+
 
 @api_view(['GET'])
 @group_required(['EnglishCafe'])
