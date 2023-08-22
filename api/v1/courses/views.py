@@ -22,7 +22,7 @@ def programme_list(request):
     try:
         transaction.set_autocommit(False)
         if (programmes := Programme.objects.filter(is_deleted=False)).exists():
-
+            programmes = programmes.order_by('order_id')
             serialized_data = ProgrammeListSerializers(
                 programmes,
                 context = {
