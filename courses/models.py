@@ -201,8 +201,6 @@ class StudentDailyImageTopic(BaseModel):
     is_completed = models.BooleanField(default=False)
     is_processed = models.BooleanField(default=False)
 
-
-
     class Meta:
         db_table = 'courses_student_daily_image_topic'
         verbose_name = ('Student Daily Image Topic')
@@ -211,6 +209,11 @@ class StudentDailyImageTopic(BaseModel):
 
     def __str__(self):
         return "{}-{}".format(self.daily_image_topic.__str__(), self.student_profile.__str__()) 
+    
+
+
+
+
 
 
 

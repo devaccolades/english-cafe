@@ -8,6 +8,7 @@ urlpatterns =[
     # =================user==================
     re_path(r'^create-career-enquiry/$', views.create_career_enquiry, name="add-career-enquiry"),
     re_path(r'^company-count-data/$', views.company_count_data, name="company-count-data"),
+    re_path(r'^create-enquiry-email/$', views.create_enquiry, name="send-email"),
 
     # ================admin================
     re_path(r'^add-achievement/$', views.add_achievement, name="add-achievement"),
@@ -34,6 +35,5 @@ urlpatterns =[
 
     re_path(r'^get-career-enquiry/$', views.get_career_enquiry, name="get-career-enquiry"),
     re_path(r'^get-enquiry/$', views.get_enquiry, name="get-enquiry"),
-    re_path(r'^create-enquiry-email/$', views.create_enquiry, name="send-email"),
 
 ]

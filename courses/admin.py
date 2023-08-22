@@ -61,6 +61,7 @@ class StudentDailyImageTopicAdmin(admin.ModelAdmin):
 
 admin.site.register(StudentDailyImageTopic, StudentDailyImageTopicAdmin)
 
+
 class StudentDayAdmin(admin.ModelAdmin):
     list_display = ("id", "day", "student", "status", "is_completed")
 
