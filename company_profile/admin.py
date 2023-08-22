@@ -36,3 +36,9 @@ class EnquiryAdmin(admin.ModelAdmin):
     list_display = ('id', 'name', 'phone', 'email', 'message')
 
 admin.site.register(Enquiry, EnquiryAdmin)
+
+
+class CompanyCountAdmin(admin.ModelAdmin):
+    list_display = ('id', 'successfull_students', 'languages_trainee', 'awards_won', 'courses')
+
+admin.site.register(CompanyCount, CompanyCountAdmin)

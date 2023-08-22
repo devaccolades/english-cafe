@@ -111,3 +111,19 @@ class Enquiry(BaseModel):
 
     def __str__(self):
         return self.name
+    
+
+class CompanyCount(BaseModel):
+    successfull_students = models.IntegerField( null=True, blank=True)
+    languages_trainee = models.IntegerField( null=True, blank=True)
+    awards_won = models.IntegerField( null=True, blank=True)
+    courses = models.IntegerField( null=True, blank=True)
+
+    class Meta:
+        db_table = 'courses_company_count'
+        verbose_name = ('Company Count')
+        verbose_name_plural = ('Company Count')
+        ordering = ('id',)
+    
+    def __str__(self):
+        return str(self.successfull_students)
