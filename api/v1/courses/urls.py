@@ -12,6 +12,7 @@ urlpatterns = [
     re_path(r'^get-daily-topics/(?P<pk>.*)/$',views.get_daily_topics, name="daily-topics"),
     re_path(r'^daily-topic-complete/(?P<pk>.*)/$',views.daily_topic_complete, name="daily-topic-complete"), 
     re_path(r'^mark-as-complete/(?P<pk>.*)/$',views.mark_as_complete, name="mark-as-complete"),
+    re_path(r'^current-day/$',views.current_day, name="current-day"),
 
     # ===============admin=============================
     re_path(r'^get-admin-daily-topics/(?P<pk>.*)/$',views.get_admin_daily_topics, name="admin-daily-topics"),

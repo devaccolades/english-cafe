@@ -975,6 +975,59 @@ def mark_as_complete(request, pk):
     return Response({'app_data': response_data}, status=status.HTTP_200_OK)
 
 
+@api_view(['GET'])
+@group_required(['Student'])
+def current_day(request):
+    try:
+        user = request.user
+        if (student := StudentProfile.objects.filter(user=user, is_deleted=False)).exists():
+            student = student.latest("date_added")
+
+            if (student_day := StudentDay.objects.filter(student=student, is_completed=False, status='ongoing')).exists():
+                student_day = student_day.latest("date_added")
+                current_day_id = student_day.day.id
+
+                response_data = {
+                    "StatusCode" : 6000,
+                    "data" : {
+                        "current_day_id" : current_day_id
+                    }
+                }
+
+            else:
+                response_data = {
+                    "StatusCode" : 6001,
+                    "data" : {
+                        "title" : "Failed",
+                        "message" : "Student day not found"
+                    }
+                }
+        else:
+            response_data = {
+                "StatusCode" : 6001,
+                "data" : {
+                    "title" : "Failed",
+                    "message" : "Student not found"
+                }
+            }
+    except Exception as e:
+        transaction.rollback()
+        errType = e.__class__.__name__
+        errors = {
+            errType: traceback.format_exc()
+        }
+        response_data = {
+            "status": 0,
+            "api": request.get_full_path(),
+            "request": request.data,
+            "message": str(e),
+            "response": errors
+        }
+
+    return Response({'app_data': response_data}, status=status.HTTP_200_OK)
+
+
+
 @api_view(['POST'])
 @group_required(['EnglishCafe'])
 def add_programme(request):
