@@ -817,7 +817,6 @@ def mark_as_complete(request, pk):
 
                                 if (student_day := StudentDay.objects.filter(day=day, student__user=user, is_deleted=False)).exists():
                                     student_day = student_day.latest("date_added")
-
                                     student_day.status = 'completed'
                                     student_day.is_completed = True
                                     student_day.save()
@@ -839,7 +838,9 @@ def mark_as_complete(request, pk):
                                                 "user_pk" : student.user.id
                                             }
 
-                                            if Day.objects.filter(programme=programme, day_number=next_day_number).exists():
+                                            if (next_day := Day.objects.filter(programme=programme, day_number=next_day_number)).exists():
+                                                next_day = next_day.latest("id")
+                                                print(next_day,"-=-=-=-=-=-=-=-=-=-=-=-=-")
 
                                                 assing_first_topic_of_a_day(student_data, programme, next_day_number)
 
@@ -848,7 +849,8 @@ def mark_as_complete(request, pk):
                                                     "StatusCode" : 6000,
                                                     "data" : {
                                                         "title" : "Success",
-                                                        "message" : f"Successfully completed day-{day.day_number} and unlocked day-{next_day_number}"
+                                                        "message" : f"Successfully completed day-{day.day_number} and unlocked day-{next_day_number}",
+                                                        "next_day_id" : next_day.id
                                                     }
                                                 }
                                             else:
