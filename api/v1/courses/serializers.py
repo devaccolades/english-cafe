@@ -4,6 +4,7 @@ from general.encryptions import decrypt
 
 
 class StudentDayListSerializer(serializers.ModelSerializer):
+    student_day_pk = serializers.SerializerMethodField()
     programme = serializers.SerializerMethodField()
     is_completed = serializers.SerializerMethodField()
     status = serializers.SerializerMethodField()
@@ -17,6 +18,7 @@ class StudentDayListSerializer(serializers.ModelSerializer):
             'no_of_contents',
             'is_completed',
             'status',
+            'student_day_pk',
         )
     
     def get_programme(self, instance):
@@ -42,6 +44,17 @@ class StudentDayListSerializer(serializers.ModelSerializer):
             return student_day.status
         else:
             return 'locked'
+    
+    def get_student_day_pk(self, instance):
+        student = self.context['student']
+        if (student_day := StudentDay.objects.filter(day=instance, student=student)).exists():
+            student_day = student_day.latest("date_added")
+
+            student_day_pk = student_day.id
+            return student_day_pk
+        else:
+            return None
+
 
 
 class DailyAudioTopicSerializer(serializers.ModelSerializer):
