@@ -217,7 +217,7 @@ def login_student_profile(request):
                         "StatusCode" : 6000,
                         "data" : {
                             "title" : "Success",
-                            "student_pk" : student_profile.id,
+                            "student_id" : student_profile.id,
                             "access" : access
                         }
                     }

@@ -418,7 +418,6 @@ def daily_topic_complete(request, pk):
                 next_topic_id = audio_topic.next_topic_id
 
                 if not StudentDailyAudioTopic.objects.filter(daily_audio_topic=audio_topic, student_profile=student_profile).exists():
-                    print("if not function ok")
                     student_audio_topic = StudentDailyAudioTopic.objects.create(
                         auto_id = get_auto_id(StudentDailyAudioTopic),
                         daily_audio_topic = audio_topic,
@@ -427,25 +426,18 @@ def daily_topic_complete(request, pk):
                     )
 
                     if student_audio_topic.is_completed == True:
-                        if not next_topic_id == None:
-                            assign_next_topic(next_topic_id, student_profile)
+
+                        assign_next_topic(next_topic_id, student_profile)
+                    
+                        transaction.commit()
+                        response_data = {
+                            "StatusCode" : 6000,
+                            "data" : {
+                                "title" : "Success",
+                                "message" : "Student daily audio completed successfully"
+                            }
+                        }
                         
-                            transaction.commit()
-                            response_data = {
-                                "StatusCode" : 6000,
-                                "data" : {
-                                    "title" : "Success",
-                                    "message" : "Student daily audio completed successfully"
-                                }
-                            }
-                        else:
-                            response_data = {
-                                "StatusCode" : 6001,
-                                "data" : {
-                                    "title" : "Success",
-                                    "message" : "Milestone Reached!"
-                                }
-                            }
                     else:
                         response_data = {
                             "StatusCode" : 6001,
@@ -455,15 +447,6 @@ def daily_topic_complete(request, pk):
                             }
                         }
 
-                    # transaction.commit()
-                    # response_data = {
-                    #     "StatusCode" : 6000,
-                    #     "data" : {
-                    #         "title" : "Success",
-                    #         "message" : "Student daily audio completed successfully"
-                    #     }
-                    # }
-
                 elif (student_daily_audio_topic := StudentDailyAudioTopic.objects.filter(daily_audio_topic=audio_topic, student_profile=student_profile, is_completed=False)).exists():
                     print("come to elif function")
                     student_daily_audio_topic = student_daily_audio_topic.latest("date_added")
@@ -471,25 +454,28 @@ def daily_topic_complete(request, pk):
                     student_daily_audio_topic.save()
                     
                     if student_daily_audio_topic.is_completed == True:
-                        if not next_topic_id == None:
-                            assign_next_topic(next_topic_id, student_profile)
-                    
+
+                        if next_topic_id == None:
                             transaction.commit()
                             response_data = {
                                 "StatusCode" : 6000,
                                 "data" : {
                                     "title" : "Success",
-                                    "message" : "Student daily audio completed successfully"
+                                    "message" : "Milestone Reached!"
                                 }
                             }
+                            return Response({'app_data': response_data}, status=status.HTTP_200_OK)
                         else:
-                            response_data = {
-                                "StatusCode" : 6001,
-                                "data" : {
-                                    "title" : "Success",
-                                    "message" : "Milestone Reached !!!"
-                                }
+                            assign_next_topic(next_topic_id, student_profile)
+                
+                        transaction.commit()
+                        response_data = {
+                            "StatusCode" : 6000,
+                            "data" : {
+                                "title" : "Success",
+                                "message" : "Student daily audio completed successfully"
                             }
+                        }
 
                     else:
                         response_data = {
@@ -521,25 +507,17 @@ def daily_topic_complete(request, pk):
                     )
 
                     if student_daily_video_topic.is_completed == True:
-                        if not next_topic_id == None:
-                            assign_next_topic(next_topic_id, student_profile)
-                    
-                            transaction.commit()
-                            response_data = {
-                                "StatusCode" : 6000,
-                                "data" : {
-                                    "title" : "Success",
-                                    "message" : "Student daily video completed successfully"
-                                }
+
+                        assign_next_topic(next_topic_id, student_profile)
+                
+                        transaction.commit()
+                        response_data = {
+                            "StatusCode" : 6000,
+                            "data" : {
+                                "title" : "Success",
+                                "message" : "Student daily video completed successfully"
                             }
-                        else:
-                            response_data = {
-                                "StatusCode" : 6001,
-                                "data" : {
-                                    "title" : "Success",
-                                    "message" : "Milestone Reached !!!"
-                                }
-                            }
+                        }
                     else:
                         response_data = {
                             "StatusCode" : 6001,
@@ -555,25 +533,28 @@ def daily_topic_complete(request, pk):
                     student_daily_video_topic.save()
                     
                     if student_daily_video_topic.is_completed == True:
-                        if not next_topic_id == None:
-                            assign_next_topic(next_topic_id, student_profile)
-                    
+
+                        if next_topic_id == None:
                             transaction.commit()
                             response_data = {
                                 "StatusCode" : 6000,
                                 "data" : {
                                     "title" : "Success",
-                                    "message" : "Student daily video completed successfully"
+                                    "message" : "Milestone Reached!"
                                 }
                             }
+                            return Response({'app_data': response_data}, status=status.HTTP_200_OK)
                         else:
-                            response_data = {
-                                "StatusCode" : 6001,
-                                "data" : {
-                                    "title" : "Success",
-                                    "message" : "Milestone Reached !!!"
-                                }
+                            assign_next_topic(next_topic_id, student_profile)
+                
+                        transaction.commit()
+                        response_data = {
+                            "StatusCode" : 6000,
+                            "data" : {
+                                "title" : "Success",
+                                "message" : "Student daily video completed successfully"
                             }
+                        }
                     else:
                         response_data = {
                             "StatusCode" : 6001,
@@ -605,25 +586,17 @@ def daily_topic_complete(request, pk):
                     )
 
                     if student_daily_image_topic.is_completed == True:
-                        if not next_topic_id == None:
-                            assign_next_topic(next_topic_id, student_profile)
-                    
-                            transaction.commit()
-                            response_data = {
-                                "StatusCode" : 6000,
-                                "data" : {
-                                    "title" : "Success",
-                                    "message" : "Student daily image completed successfully"
-                                }
+
+                        assign_next_topic(next_topic_id, student_profile)
+                
+                        transaction.commit()
+                        response_data = {
+                            "StatusCode" : 6000,
+                            "data" : {
+                                "title" : "Success",
+                                "message" : "Student daily image completed successfully"
                             }
-                        else:
-                            response_data = {
-                                "StatusCode" : 6001,
-                                "data" : {
-                                    "title" : "Success",
-                                    "message" : "Milestone Reached !!!"
-                                }
-                            }
+                        }
                     else:
                         response_data = {
                             "StatusCode" : 6001,
@@ -639,25 +612,28 @@ def daily_topic_complete(request, pk):
                     student_daily_image_topic.save()
 
                     if student_daily_image_topic.is_completed == True:
-                        if not next_topic_id == None:
-                            assign_next_topic(next_topic_id, student_profile)
-                        
+
+                        if next_topic_id == None:
                             transaction.commit()
                             response_data = {
                                 "StatusCode" : 6000,
                                 "data" : {
                                     "title" : "Success",
-                                    "message" : "Student daily image completed successfully"
+                                    "message" : "Milestone Reached!"
                                 }
                             }
+                            return Response({'app_data': response_data}, status=status.HTTP_200_OK)
                         else:
-                            response_data = {
-                                "StatusCode" : 6001,
-                                "data" : {
-                                    "title" : "Success",
-                                    "message" : "Milestone Reached !!!"
-                                }
+                            assign_next_topic(next_topic_id, student_profile)
+                    
+                        transaction.commit()
+                        response_data = {
+                            "StatusCode" : 6000,
+                            "data" : {
+                                "title" : "Success",
+                                "message" : "Student daily image completed successfully"
                             }
+                        }
                     else:
                         response_data = {
                             "StatusCode" : 6001,
@@ -679,7 +655,6 @@ def daily_topic_complete(request, pk):
                 text_topic = text_topic.latest("date_added")
                 next_topic_id = text_topic.next_topic_id
                 
-
                 if not StudentDailyTextTopic.objects.filter(daily_text_topic=text_topic, student_profile=student_profile).exists():
                     student_daily_text_topic = StudentDailyTextTopic.objects.create(
                         auto_id = get_auto_id(StudentDailyTextTopic),
@@ -689,25 +664,18 @@ def daily_topic_complete(request, pk):
                     )
 
                     if student_daily_text_topic.is_completed == True:
-                        if not next_topic_id == None:
-                            assign_next_topic(next_topic_id, student_profile)
-                        
-                            transaction.commit()
-                            response_data = {
-                                "StatusCode" : 6000,
-                                "data" : {
-                                    "title" : "Success",
-                                    "message" : "Student daily text completed successfully"
-                                }
+
+
+                        assign_next_topic(next_topic_id, student_profile)
+                    
+                        transaction.commit()
+                        response_data = {
+                            "StatusCode" : 6000,
+                            "data" : {
+                                "title" : "Success",
+                                "message" : "Student daily text completed successfully"
                             }
-                        else:
-                            response_data = {
-                                "StatusCode" : 6001,
-                                "data" : {
-                                    "title" : "Success",
-                                    "message" : "Milestone Reached !!!"
-                                }
-                            }
+                        }
                     else:
                         response_data = {
                             "StatusCode" : 6001,
@@ -718,31 +686,35 @@ def daily_topic_complete(request, pk):
                         } 
                    
 
-                elif (student_daily_text_topic := StudentDailyTextTopic.objects.filter(daily_text_topic=text_topic, student_profile=student_profile, is_deleted=False)).exists():
+                elif (student_daily_text_topic := StudentDailyTextTopic.objects.filter(daily_text_topic=text_topic, student_profile=student_profile, is_completed=False, is_deleted=False)).exists():
                     student_daily_text_topic = student_daily_text_topic.latest("date_added")
+
                     student_daily_text_topic.is_completed = True
                     student_daily_text_topic.save()
                     
-                    if student_daily_text_topic.is_completed == True:
-                        if not next_topic_id == None:
-                            assign_next_topic(next_topic_id, student_profile)
-                        
+                    if student_daily_text_topic.is_completed:
+
+                        if next_topic_id == None:
                             transaction.commit()
                             response_data = {
                                 "StatusCode" : 6000,
                                 "data" : {
                                     "title" : "Success",
-                                    "message" : "Student daily text completed successfully"
+                                    "message" : "Milestone Reached!"
                                 }
                             }
+                            return Response({'app_data': response_data}, status=status.HTTP_200_OK)
                         else:
-                            response_data = {
-                                "StatusCode" : 6001,
-                                "data" : {
-                                    "title" : "Success",
-                                    "message" : "Milestone Reached !!!"
-                                }
+                            assign_next_topic(next_topic_id, student_profile)
+                    
+                        transaction.commit()
+                        response_data = {
+                            "StatusCode" : 6000,
+                            "data" : {
+                                "title" : "Success",
+                                "message" : "Student daily text completed successfully"
                             }
+                        }
                     else:
                         response_data = {
                             "StatusCode" : 6001,
@@ -840,7 +812,6 @@ def mark_as_complete(request, pk):
 
                                             if (next_day := Day.objects.filter(programme=programme, day_number=next_day_number)).exists():
                                                 next_day = next_day.latest("id")
-                                                print(next_day,"-=-=-=-=-=-=-=-=-=-=-=-=-")
 
                                                 assing_first_topic_of_a_day(student_data, programme, next_day_number)
 
