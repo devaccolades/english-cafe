@@ -351,7 +351,7 @@ def students(request):
 
 
 @api_view(['GET'])
-@group_required(['EnglishCafe'])
+@group_required(['EnglishCafe', 'Student'])
 def student(request, pk):
     try:
         transaction.set_autocommit(False)
