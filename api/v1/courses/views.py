@@ -863,10 +863,10 @@ def mark_as_complete(request, pk):
 
                                     else:
                                         response_data = {
-                                            "StatusCode" : 6001,
+                                            "StatusCode" : 6000,
                                             "data" : {
-                                                "title" : "Failed",
-                                                "message" : "An error occurred in assign next day"
+                                                "title" : "Success",
+                                                "message" : f"{programme} completed successfully"
                                             }
                                         }
                                 else:
