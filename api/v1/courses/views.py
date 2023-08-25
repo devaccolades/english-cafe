@@ -810,47 +810,47 @@ def mark_as_complete(request, pk):
                                                 "user_pk" : student.user.id
                                             }
 
-                                            if (next_day := Day.objects.filter(programme=programme, day_number=next_day_number)).exists():
-                                                next_day = next_day.latest("id")
+                                            # if (next_day := Day.objects.filter(programme=programme, day_number=next_day_number)).exists():
+                                            #     next_day = next_day.latest("id")
 
-                                                assing_first_topic_of_a_day(student_data, programme, next_day_number)
+                                            assing_first_topic_of_a_day(student_data, programme, next_day_number)
 
-                                                transaction.commit()
-                                                response_data = {
-                                                    "StatusCode" : 6000,
-                                                    "data" : {
-                                                        "title" : "Success",
-                                                        "message" : f"Successfully completed day-{day.day_number} and unlocked day-{next_day_number}",
-                                                        "next_day_id" : next_day.id
-                                                    }
+                                            transaction.commit()
+                                            response_data = {
+                                                "StatusCode" : 6000,
+                                                "data" : {
+                                                    "title" : "Success",
+                                                    "message" : f"Successfully completed day-{day.day_number} and unlocked day-{next_day_number}",
+                                                    "next_day_id" : next_day.id
                                                 }
-                                            else:
-                                                if (last_day := Day.objects.filter(programme=programme, is_deleted=False)).exists():
-                                                    last_day = last_day.latest("day_number")
+                                            }
+                                            # else:
+                                            #     if (last_day := Day.objects.filter(programme=programme, is_deleted=False)).exists():
+                                            #         last_day = last_day.latest("day_number")
 
-                                                    if next_day_number == last_day.day_number:
+                                            #         if next_day_number == last_day.day_number:
                                                         
-                                                        if (last_student_day := StudentDay.objects.filter(day=last_day, student=student, is_complete=True, status='completed')).exists():
+                                            #             if (last_student_day := StudentDay.objects.filter(day=last_day, student=student, is_complete=True, status='completed')).exists():
 
-                                                            response_data = {
-                                                                "StatusCode" : 6000,
-                                                                "data" : {
-                                                                    "title" : "Success",
-                                                                    "message" : f"{programme} completed successfully"
-                                                                }
-                                                            }
-                                                        else:
-                                                            pass
-                                                    else:
-                                                        pass
-                                                else:
-                                                    response_data = {
-                                                        "StatusCode" : 6001,
-                                                        "data" : {
-                                                            "title" : "Failed",
-                                                            "message" : "An error occured"
-                                                        }
-                                                    }
+                                            #                 response_data = {
+                                            #                     "StatusCode" : 6000,
+                                            #                     "data" : {
+                                            #                         "title" : "Success",
+                                            #                         "message" : f"{programme} completed successfully"
+                                            #                     }
+                                            #                 }
+                                            #             else:
+                                            #                 pass
+                                            #         else:
+                                            #             pass
+                                            #     else:
+                                            #         response_data = {
+                                            #             "StatusCode" : 6001,
+                                            #             "data" : {
+                                            #                 "title" : "Failed",
+                                            #                 "message" : "An error occured"
+                                            #             }
+                                            #         }
 
                                         else:
                                             response_data = {
