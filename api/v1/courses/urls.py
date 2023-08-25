@@ -32,6 +32,9 @@ urlpatterns = [
     re_path(r'^add-day/(?P<pk>.*)/$',views.add_day, name="add-day"),
     re_path(r'^add-number-of-content-in-a-day/(?P<pk>.*)/$',views.add_number_of_content, name="add-day"),
     re_path(r'^number-of-content-in-a-day/(?P<pk>.*)/$',views.number_of_content, name="number-of-content-in-a-day"),
+    re_path(r'^delete-days/(?P<pk>.*)/$',views.delete_days, name="delete-days"),
+    re_path(r'^delete-single-day/(?P<pk>.*)/$',views.delete_single_day, name="delete-day"),
+
     re_path(r'^student-count/$',views.student_count, name="student-count"),
 
 

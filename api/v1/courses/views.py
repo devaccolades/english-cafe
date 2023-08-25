@@ -1963,6 +1963,100 @@ def student_count(request):
 
     return Response({'app_data': response_data}, status=status.HTTP_200_OK)
 
+
+@api_view(['POST'])
+@group_required(['EnglishCafe'])
+def delete_days(request, pk):
+    try:
+        transaction.set_autocommit(False)
+        if (programme := Programme.objects.filter(pk=pk, is_deleted=False)).exists():
+            programme = programme.latest("date_added")
+
+            if (days := Day.objects.filter(programme=programme, is_deleted=False)).exists():
+                for day in days:
+                    day.delete()
+                    transaction.commit()
+                    response_data = {
+                        "StatusCode" : 6000,
+                        "data" : {
+                            "title" : "Success",
+                            "message" : "all days deleted successfully"
+                         }
+                    }
+            else:
+                response_data = {
+                    "StatusCode" : 6001,
+                    "data" : {
+                        "title" : "Failed",
+                        "message" : "Days not found"
+                    }
+                }
+        else:
+            response_data = {
+                "StatusCode" : 6001,
+                "data" : {
+                    "title" : "Failed",
+                    "message" : "Programme not found"
+                }
+            }
+    except Exception as e:
+        transaction.rollback()
+        errType = e.__class__.__name__
+        errors = {
+            errType: traceback.format_exc()
+        }
+        response_data = {
+            "status": 0,
+            "api": request.get_full_path(),
+            "request": request.data,
+            "message": str(e),
+            "response": errors
+        }
+
+    return Response({'app_data': response_data}, status=status.HTTP_200_OK)
+
+
+@api_view(['POST'])
+@group_required(['EnglishCafe'])
+def delete_single_day(request, pk):
+    try:
+        transaction.set_autocommit(False)
+        if (day := Day.objects.filter(pk=pk, is_deleted=False)).exists():
+            day = day.latest("id")
+            day.delete()
+            transaction.commit()
+            response_data = {
+                "StatusCode" : 6000,
+                "data" : {
+                    "title" : "Success",
+                    "message" : "Day deleted successfully"
+                }
+            }
+        else:
+            response_data = {
+                "StatusCode" : 6001,
+                "data" : {
+                    "title" : "Failed",
+                    "message" : "Day not found"
+                }
+            }
+    except Exception as e:
+        transaction.rollback()
+        errType = e.__class__.__name__
+        errors = {
+            errType: traceback.format_exc()
+        }
+        response_data = {
+            "status": 0,
+            "api": request.get_full_path(),
+            "request": request.data,
+            "message": str(e),
+            "response": errors
+        }
+
+    return Response({'app_data': response_data}, status=status.HTTP_200_OK)
+
+
     
 
 
