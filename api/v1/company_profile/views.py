@@ -1056,6 +1056,7 @@ def create_career_enquiry(request):
                     cv = cv
                 )
 
+                transaction.commit()
                 response_data = {
                     "StatusCode" : 6000,
                     "data" : {
