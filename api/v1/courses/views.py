@@ -824,7 +824,7 @@ def mark_as_complete(request, pk):
                                                 "StatusCode" : 6000,
                                                 "data" : {
                                                     "title" : "Success",
-                                                    "message" : f"Successfully completed day-{day.day_number} and unlocked day-{next_day_number}",
+                                                    "message" : "Successfully completed the current day",
                                                     "next_day_id" : next_day.id
                                                 }
                                             }
