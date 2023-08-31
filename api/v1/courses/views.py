@@ -2,11 +2,10 @@ import traceback
 
 from django.db import transaction
 
-from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import AllowAny, IsAdminUser, IsAuthenticated
+from rest_framework.permissions import AllowAny
 
 from general.decorators import group_required
 from general.functions import generate_serializer_errors, get_auto_id, assing_first_topic_of_a_day
