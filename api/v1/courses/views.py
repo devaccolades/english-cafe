@@ -269,8 +269,10 @@ def get_admin_daily_topics(request, pk):
     try:
         if (day := Day.objects.filter(pk=pk, is_deleted=False)).exists():
             day = day.latest("id")
-
-            number_of_contents_in_a_day = day.no_of_contents
+            if day.no_of_contents:
+                number_of_contents_in_a_day = day.no_of_contents
+            else:
+                number_of_contents_in_a_day = 0
 
             topics =[]
             temp_data = []
@@ -372,6 +374,7 @@ def get_admin_daily_topics(request, pk):
 
             response_data = {
                 "StatusCode" : 6000,
+                "number_of_contents_in_a_day":number_of_contents_in_a_day,
                 "data" : topics
             }
             
