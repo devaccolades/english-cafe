@@ -178,3 +178,10 @@ class CompanyCountListSerializer(serializers.ModelSerializer):
             'awards_won',
             'courses'
         )
+
+
+class AddCompanyCountSerializer(serializers.Serializer):
+    successfull_students = serializers.IntegerField()
+    languages_trainee = serializers.IntegerField()
+    awards_won = serializers.IntegerField()
+    courses = serializers.IntegerField()

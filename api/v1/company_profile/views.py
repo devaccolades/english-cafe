@@ -1395,36 +1395,175 @@ def create_enquiry(request):
 
     return Response({'app_data': response_data}, status=status.HTTP_200_OK)
 
-    # name = "Shyam"
-    # email = "shyamkp98@gmail.com"
-    # phone = 8921924446
+
+@api_view(['POST'])
+@group_required(['EnglishCafe'])
+def add_company_profile_count(request):
+    try:
+        transaction.set_autocommit(False)
+        serialized_data = AddCompanyCountSerializer(data=request.data)
+        if serialized_data.is_valid():
+            successfull_students = request.data["successfull_students"]
+            languages_trainee = request.data["languages_trainee"]
+            awards_won = request.data["awards_won"]
+            courses = request.data["courses"]
+
+            max_instances = 1
+
+            instance_count = CompanyCount.objects.count()
+
+            if not instance_count >= max_instances:
+                comapny_count = CompanyCount.objects.create(
+                    auto_id = get_auto_id(CompanyCount),
+                    successfull_students = successfull_students,
+                    languages_trainee = languages_trainee,
+                    awards_won = awards_won,
+                    courses = courses
+                )
+
+                transaction.commit()
+                response_data = {
+                    "StatusCode" : 6000,
+                    "data" : {
+                        "title" : "Success",
+                        "message" : "Company profile count created successfully"
+                    }
+                }
+            else:
+                response_data = {
+                    "StatusCode" : 6001,
+                    "data" : {
+                        "title" : "Failed",
+                        "message" : "You can only add one instance. Edit the existing instance"
+                    }
+                }
+        else:
+            response_data = {
+                "StatusCode" : 6001,
+                "data" : {
+                    "title" : "Failed",
+                    "message" : generate_serializer_errors(serialized_data._errors)
+                }
+            }
+    except  Exception as e:
+        transaction.rollback()
+        errType = e.__class__.__name__
+        errors = {
+            errType: traceback.format_exc()
+        }
+        response_data = {
+            "status": 0,
+            "api": request.get_full_path(),
+            "request": request.data,
+            "message": str(e),
+            "response": errors
+        }
+
+    return Response({'app_data': response_data}, status=status.HTTP_200_OK)
+
+
+@api_view(['GET'])
+@group_required(['Student', 'EnglishCafe'])
+def get_company_profile_count(request):
+    try:
+        transaction.set_autocommit(False)
+        if (company_counts := CompanyCount.objects.filter(is_deleted=False)).exists():
+            company_counts = company_counts.latest("date_added")
+            serialized_data = CompanyCountListSerializer(
+                company_counts,
+                context = {
+                    "request" : request,
+                },
+            ).data
+
+            transaction.commit()
+
+            response_data = {
+                "StatusCode" : 6000,
+                "data" : serialized_data
+            }
+        else:
+            response_data = {
+                "StatusCode" : 6001,
+                "data" : {
+                    "title" : "Failed",
+                    "message" : "Company count not found"
+                }
+            }
+    except  Exception as e:
+        transaction.rollback()
+        errType = e.__class__.__name__
+        errors = {
+            errType: traceback.format_exc()
+        }
+        response_data = {
+            "status": 0,
+            "api": request.get_full_path(),
+            "request": request.data,
+            "message": str(e),
+            "response": errors
+        }
+
+    return Response({'app_data': response_data}, status=status.HTTP_200_OK)
+
+
+@api_view(['POST'])
+@group_required(['EnglishCafe'])
+def edit_company_profile_count(request, pk):
+    try:
+        transaction.set_autocommit(False)
+        successfull_students = request.data.get("successfull_students")
+        languages_trainee = request.data.get("languages_trainee")
+        awards_won = request.data.get("awards_won")
+        courses = request.data.get("courses")
+
+        if (company_profile_count := CompanyCount.objects.filter(pk=pk, is_deleted=False)).exists():
+            company_profile_count = company_profile_count.latest("date_added")
+
+            if successfull_students:
+                company_profile_count.successfull_students = successfull_students
+            if languages_trainee:
+                company_profile_count.languages_trainee = languages_trainee
+            if awards_won:
+                company_profile_count.awards_won = awards_won
+            if courses:
+                company_profile_count.courses = courses
+            company_profile_count.save()
+            
+            transaction.commit()
+            response_data = {
+                "StatusCode" : 6000,
+                "data" : {
+                    "title" : "Success",
+                    "message" : "Company count edit completed successfully"
+                }
+            }
+        else:
+            response_data = {
+                "StatusCode" : 6001,
+                "data" : {
+                    "title" : "Failed",
+                    "message" : "Company count not found"
+                }
+            }
+    except  Exception as e:
+        transaction.rollback()
+        errType = e.__class__.__name__
+        errors = {
+            errType: traceback.format_exc()
+        }
+        response_data = {
+            "status": 0,
+            "api": request.get_full_path(),
+            "request": request.data,
+            "message": str(e),
+            "response": errors
+        }
+
+    return Response({'app_data': response_data}, status=status.HTTP_200_OK)
+
     
 
-    # subject = "Request for Enquiry"
-    # content = "Request for Enquiry"
-
-    # context = {
-    #     "request" : request,
-    #     'email' : email,
-    #     'name' :name,
-    #     'phone' : phone,
-    #     'email' : email,
-    #     "subject" : subject,
-    #     "content" : content,
-    #     'mail_title' : "Enquiry Details",
-    # }
-    # template_name = 'enquiry.html'
-    # html_content = render_to_string(template_name, context)
-    # try:
-    #     send_emails(email, subject, content, html_content)
-    # except Exception as e:
-    #     print(str(e),"=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=")
-
-    # response_data = {
-    #     "StatusCode" : 6000, 
-    # }
-
-    # return Response({'app_data': response_data}, status=status.HTTP_200_OK)
 
     
 
