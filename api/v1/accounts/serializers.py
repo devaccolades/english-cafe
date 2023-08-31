@@ -25,6 +25,7 @@ class StudentListSerializer(serializers.ModelSerializer):
     password = serializers.SerializerMethodField()
     programmes = serializers.SerializerMethodField()
     programme_id = serializers.SerializerMethodField()
+    programme_duration = serializers.SerializerMethodField()
 
     class Meta:
         model = StudentProfile
@@ -35,7 +36,8 @@ class StudentListSerializer(serializers.ModelSerializer):
             'password',
             'phone',
             'programmes',
-            'programme_id'
+            'programme_id',
+            'programme_duration',
         )
 
     def get_password(self, instance):
@@ -55,5 +57,11 @@ class StudentListSerializer(serializers.ModelSerializer):
     def get_programme_id(self, instance):
         if instance.programmes:
             return  instance.programmes.id
+        else:
+            return None
+        
+    def get_programme_duration(self, instance):
+        if instance.programmes:
+            return instance.programmes.duration
         else:
             return None
