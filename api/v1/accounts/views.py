@@ -1,7 +1,5 @@
-import requests
 import traceback
 
-from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
@@ -19,7 +17,6 @@ from general.encryptions import decrypt, encrypt
 from api.v1.accounts.serializers import *
 from accounts.models import *
 from courses.models import Programme
-
 
 
 @api_view(['POST'])
