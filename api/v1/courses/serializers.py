@@ -274,30 +274,19 @@ class AddNumberOfContentSerializer(serializers.Serializer):
 
 
 class DailyAdminAudioTopicSerializer(serializers.ModelSerializer):
-    number_of_content = serializers.SerializerMethodField()
-
+    
     class Meta:
         model = DailyAudioTopic
         fields = (
             'id',
             'audio',
             "order_id",
-            "number_of_content",
         )
     
-    def get_number_of_content(self, instance):
-        if instance.day:
-            if instance.day.no_of_contents:
-                return instance.day.no_of_contents
-            else:
-                return 0
-        else:
-            return None
+    
     
     
 class DailyAdminImageTopicSerializer(serializers.ModelSerializer):
-    number_of_content = serializers.SerializerMethodField()
-
    
     class Meta:
         model = DailyImageTopic
@@ -305,22 +294,12 @@ class DailyAdminImageTopicSerializer(serializers.ModelSerializer):
             "id",
             "daily_image",
             "order_id",
-            "number_of_content",
         )
 
-    def get_number_of_content(self, instance):
-        if instance.day:
-            if instance.day.no_of_contents:
-                return instance.day.no_of_contents
-            else:
-                return 0
-        else:
-            return None
+    
     
     
 class DailyAdminVideoTopicSerializer(serializers.ModelSerializer):
-    number_of_content = serializers.SerializerMethodField()
-
 
     class Meta:
         model = DailyVideoTopic
@@ -328,22 +307,12 @@ class DailyAdminVideoTopicSerializer(serializers.ModelSerializer):
             'id',
             'video',
             "order_id",
-            "number_of_content",
         )
 
-    def get_number_of_content(self, instance):
-        if instance.day:
-            if instance.day.no_of_contents:
-                return instance.day.no_of_contents
-            else:
-                return 0
-        else:
-            return None
+    
     
     
 class DailyAdminTextSerializer(serializers.ModelSerializer):
-    number_of_content = serializers.SerializerMethodField()
-
 
     class Meta:
         model = DailyTextTopic
@@ -351,17 +320,9 @@ class DailyAdminTextSerializer(serializers.ModelSerializer):
             'id',
             'daily_text',
             "order_id",
-            "number_of_content",
         )
 
-    def get_number_of_content(self, instance):
-        if instance.day:
-            if instance.day.no_of_contents:
-                return instance.day.no_of_contents
-            else:
-                return 0
-        else:
-            return None
+    
 
     
 
