@@ -419,38 +419,37 @@ def daily_topic_complete(request, pk):
                 audio_topic = audio_topic.latest("date_added")
                 next_topic_id = audio_topic.next_topic_id
 
-                # if not StudentDailyAudioTopic.objects.filter(daily_audio_topic=audio_topic, student_profile=student_profile, is_processed=True, is_deleted=False).exists():
-                #     student_audio_topic = StudentDailyAudioTopic.objects.create(
-                #         auto_id = get_auto_id(StudentDailyAudioTopic),
-                #         daily_audio_topic = audio_topic,
-                #         student_profile = student_profile,
-                #         is_processed = True,
-                #         is_completed = True
-                #     )
+                if not StudentDailyAudioTopic.objects.filter(daily_audio_topic=audio_topic, student_profile=student_profile, is_processed=True, is_deleted=False).exists():
+                    student_audio_topic = StudentDailyAudioTopic.objects.create(
+                        auto_id = get_auto_id(StudentDailyAudioTopic),
+                        daily_audio_topic = audio_topic,
+                        student_profile = student_profile,
+                        is_processed = True,
+                        is_completed = True
+                    )
 
-                #     if student_audio_topic.is_completed == True:
+                    if student_audio_topic.is_completed == True:
 
-                #         assign_next_topic(next_topic_id, student_profile)
+                        assign_next_topic(next_topic_id, student_profile)
                     
-                #         transaction.commit()
-                #         response_data = {
-                #             "StatusCode" : 6000,
-                #             "data" : {
-                #                 "title" : "Success",
-                #                 "message" : "Student daily audio completed successfully"
-                #             }
-                #         }
+                        transaction.commit()
+                        response_data = {
+                            "StatusCode" : 6000,
+                            "data" : {
+                                "title" : "Success",
+                                "message" : "Student daily audio completed successfully"
+                            }
+                        }
                         
-                #     else:
-                #         response_data = {
-                #             "StatusCode" : 6001,
-                #             "data" : {
-                #                 "title" : "Failed",
-                #                 "message" : "Current topic is not completed"
-                #             }
-                #         }
-
-                if (student_daily_audio_topic := StudentDailyAudioTopic.objects.filter(daily_audio_topic=audio_topic, student_profile=student_profile, is_processed=True,is_completed=False, is_deleted=False)).exists():
+                    else:
+                        response_data = {
+                            "StatusCode" : 6001,
+                            "data" : {
+                                "title" : "Failed",
+                                "message" : "Current topic is not completed"
+                            }
+                        }
+                elif (student_daily_audio_topic := StudentDailyAudioTopic.objects.filter(daily_audio_topic=audio_topic, student_profile=student_profile, is_processed=True,is_completed=False, is_deleted=False)).exists():
                     print("come to elif function")
                     student_daily_audio_topic = student_daily_audio_topic.latest("date_added")
                     student_daily_audio_topic.is_completed = True
@@ -501,37 +500,37 @@ def daily_topic_complete(request, pk):
                 video_topic = video_topic.latest("date_added")
                 next_topic_id = video_topic.next_topic_id
 
-                # if not StudentDailyVideoTopic.objects.filter(daily_video_topic=video_topic, student_profile=student_profile, is_processed=True, is_deleted=False).exists():
-                #     student_daily_video_topic = StudentDailyVideoTopic.objects.create(
-                #         auto_id = get_auto_id(StudentDailyVideoTopic),
-                #         daily_video_topic = video_topic,
-                #         student_profile = student_profile,
-                #         is_processed = True,
-                #         is_completed = True
-                #     )
+                if not StudentDailyVideoTopic.objects.filter(daily_video_topic=video_topic, student_profile=student_profile, is_processed=True, is_deleted=False).exists():
+                    student_daily_video_topic = StudentDailyVideoTopic.objects.create(
+                        auto_id = get_auto_id(StudentDailyVideoTopic),
+                        daily_video_topic = video_topic,
+                        student_profile = student_profile,
+                        is_processed = True,
+                        is_completed = True
+                    )
 
-                #     if student_daily_video_topic.is_completed == True:
+                    if student_daily_video_topic.is_completed == True:
 
-                #         assign_next_topic(next_topic_id, student_profile)
+                        assign_next_topic(next_topic_id, student_profile)
                 
-                #         transaction.commit()
-                #         response_data = {
-                #             "StatusCode" : 6000,
-                #             "data" : {
-                #                 "title" : "Success",
-                #                 "message" : "Student daily video completed successfully"
-                #             }
-                #         }
-                #     else:
-                #         response_data = {
-                #             "StatusCode" : 6001,
-                #             "data" : {
-                #                 "title" : "Failed",
-                #                 "message" : "Current topic is not completed"
-                #             }
-                #         }
+                        transaction.commit()
+                        response_data = {
+                            "StatusCode" : 6000,
+                            "data" : {
+                                "title" : "Success",
+                                "message" : "Student daily video completed successfully"
+                            }
+                        }
+                    else:
+                        response_data = {
+                            "StatusCode" : 6001,
+                            "data" : {
+                                "title" : "Failed",
+                                "message" : "Current topic is not completed"
+                            }
+                        }
 
-                if (student_daily_video_topic := StudentDailyVideoTopic.objects.filter(daily_video_topic=video_topic, student_profile=student_profile, is_processed=True, is_completed=False, is_deleted=False)).exists():
+                elif (student_daily_video_topic := StudentDailyVideoTopic.objects.filter(daily_video_topic=video_topic, student_profile=student_profile, is_processed=True, is_completed=False, is_deleted=False)).exists():
                     student_daily_video_topic = student_daily_video_topic.latest("date_added")
                     student_daily_video_topic.is_completed = True
                     student_daily_video_topic.save()
@@ -581,38 +580,38 @@ def daily_topic_complete(request, pk):
                 image_topic = image_topic.latest("date_added")
                 next_topic_id = image_topic.next_topic_id
 
-                # if not StudentDailyImageTopic.objects.filter(daily_image_topic=image_topic, student_profile=student_profile, is_processed=True, is_deleted=False).exists():
-                #         student_daily_image_topic = StudentDailyImageTopic.objects.create(
-                #             auto_id = get_auto_id(StudentDailyImageTopic),
-                #             student_profile = student_profile,
-                #             daily_image_topic = image_topic,
-                #             is_processed = True,
-                #             is_completed = True
-                #         )
+                if not StudentDailyImageTopic.objects.filter(daily_image_topic=image_topic, student_profile=student_profile, is_processed=True, is_deleted=False).exists():
+                        student_daily_image_topic = StudentDailyImageTopic.objects.create(
+                            auto_id = get_auto_id(StudentDailyImageTopic),
+                            student_profile = student_profile,
+                            daily_image_topic = image_topic,
+                            is_processed = True,
+                            is_completed = True
+                        )
 
-                #         if student_daily_image_topic.is_completed == True:
+                        if student_daily_image_topic.is_completed == True:
 
-                #             assign_next_topic(next_topic_id, student_profile)
+                            assign_next_topic(next_topic_id, student_profile)
                     
-                #             transaction.commit()
-                #             response_data = {
-                #                 "StatusCode" : 6000,
-                #                 "data" : {
-                #                     "title" : "Success",
-                #                     "message" : "Student daily image completed successfully"
-                #                 }
-                #             }
-                #         else:
-                #             response_data = {
-                #                 "StatusCode" : 6001,
-                #                 "data" : {
-                #                     "title" : "Failed",
-                #                     "message" : "Current topic is not completed"
-                #                 }
-                #             }
+                            transaction.commit()
+                            response_data = {
+                                "StatusCode" : 6000,
+                                "data" : {
+                                    "title" : "Success",
+                                    "message" : "Student daily image completed successfully"
+                                }
+                            }
+                        else:
+                            response_data = {
+                                "StatusCode" : 6001,
+                                "data" : {
+                                    "title" : "Failed",
+                                    "message" : "Current topic is not completed"
+                                }
+                            }
                     
 
-                if (student_daily_image_topic := StudentDailyImageTopic.objects.filter(daily_image_topic=image_topic, student_profile=student_profile, is_processed=True, is_deleted=False)).exists():
+                elif (student_daily_image_topic := StudentDailyImageTopic.objects.filter(daily_image_topic=image_topic, student_profile=student_profile, is_processed=True, is_deleted=False)).exists():
                     student_daily_image_topic = student_daily_image_topic.latest("date_added")
                     student_daily_image_topic.is_completed = True
                     student_daily_image_topic.save()
@@ -661,39 +660,39 @@ def daily_topic_complete(request, pk):
                 text_topic = text_topic.latest("date_added")
                 next_topic_id = text_topic.next_topic_id
                 
-                # if not StudentDailyTextTopic.objects.filter(daily_text_topic=text_topic, student_profile=student_profile, is_processed=True, is_deleted=False).exists():
-                #     student_daily_text_topic = StudentDailyTextTopic.objects.create(
-                #         auto_id = get_auto_id(StudentDailyTextTopic),
-                #         daily_text_topic = text_topic,
-                #         student_profile = student_profile,
-                #         is_processed = True,
-                #         is_completed = True
-                #     )
+                if not StudentDailyTextTopic.objects.filter(daily_text_topic=text_topic, student_profile=student_profile, is_processed=True, is_deleted=False).exists():
+                    student_daily_text_topic = StudentDailyTextTopic.objects.create(
+                        auto_id = get_auto_id(StudentDailyTextTopic),
+                        daily_text_topic = text_topic,
+                        student_profile = student_profile,
+                        is_processed = True,
+                        is_completed = True
+                    )
 
-                #     if student_daily_text_topic.is_completed == True:
+                    if student_daily_text_topic.is_completed == True:
 
 
-                #         assign_next_topic(next_topic_id, student_profile)
+                        assign_next_topic(next_topic_id, student_profile)
                     
-                #         transaction.commit()
-                #         response_data = {
-                #             "StatusCode" : 6000,
-                #             "data" : {
-                #                 "title" : "Success",
-                #                 "message" : "Student daily text completed successfully"
-                #             }
-                #         }
-                #     else:
-                #         response_data = {
-                #             "StatusCode" : 6001,
-                #             "data" : {
-                #                 "title" : "Failed",
-                #                 "message" : "Current topic is not completed"
-                #             }
-                #         } 
+                        transaction.commit()
+                        response_data = {
+                            "StatusCode" : 6000,
+                            "data" : {
+                                "title" : "Success",
+                                "message" : "Student daily text completed successfully"
+                            }
+                        }
+                    else:
+                        response_data = {
+                            "StatusCode" : 6001,
+                            "data" : {
+                                "title" : "Failed",
+                                "message" : "Current topic is not completed"
+                            }
+                        } 
                    
 
-                if (student_daily_text_topic := StudentDailyTextTopic.objects.filter(daily_text_topic=text_topic, student_profile=student_profile, is_processed=True,is_completed=False, is_deleted=False)).exists():
+                elif (student_daily_text_topic := StudentDailyTextTopic.objects.filter(daily_text_topic=text_topic, student_profile=student_profile, is_processed=True,is_completed=False, is_deleted=False)).exists():
                     student_daily_text_topic = student_daily_text_topic.latest("date_added")
 
                     student_daily_text_topic.is_completed = True
