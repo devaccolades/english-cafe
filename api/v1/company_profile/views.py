@@ -1434,7 +1434,7 @@ def add_company_profile_count(request):
                     "StatusCode" : 6001,
                     "data" : {
                         "title" : "Failed",
-                        "message" : "You can only add one instance. Edit the existing instance"
+                        "message" : "Input already exists. You can only edit the existing input"
                     }
                 }
         else:
