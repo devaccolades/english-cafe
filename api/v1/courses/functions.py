@@ -1,4 +1,5 @@
 import os
+import re 
 
 from django.conf import settings
 
@@ -82,6 +83,7 @@ def convert_to_mp3(uploaded_file):
         
         # Define the output MP3 file name
         base_filename = os.path.splitext(uploaded_file.name)[0]
+        base_filename = re.sub(r'[^a-zA-Z0-9_]', '_', base_filename)
         # output_mp3_file = os.path.join(settings.MEDIA_ROOT, f"{base_filename}.mp3")
         output_mp3_file = f"{base_filename}.mp3"
         
