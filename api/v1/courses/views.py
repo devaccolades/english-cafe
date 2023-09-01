@@ -1,4 +1,5 @@
 import traceback
+import os
 
 from django.db import transaction
 
@@ -1251,9 +1252,11 @@ def add_daily_topics(request):
                             daily_audio_topic = DailyAudioTopic.objects.create(
                                 auto_id = get_auto_id(DailyAudioTopic),
                                 day = day,
-                                audio = to_mp3_file,
                                 order_id = order_id,
                             )
+
+                            daily_audio_topic.audio.save(os.path.basename(to_mp3_file), open(to_mp3_file, 'rb'))
+                            daily_audio_topic.save()
 
                             transaction.commit()
                             response_data = {
