@@ -269,7 +269,7 @@ def students(request):
         q = request.GET.get('q')
 
         if (students := StudentProfile.objects.filter(is_deleted=False)).exists():
-
+            students = students.order_by("-date_added")
             if q:
                 students = StudentProfile.objects.filter(Q(name__icontains=q) | Q(phone__icontains=q) | Q(username__icontains=q), is_deleted=False)
 
