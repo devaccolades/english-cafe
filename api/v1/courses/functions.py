@@ -1,3 +1,9 @@
+import os
+
+from django.conf import settings
+
+from pydub import AudioSegment
+
 from courses.models import *
 from general.functions import get_auto_id
 
@@ -59,6 +65,36 @@ def assign_next_topic(next_topic_id, student_profile):
             return "Failed"
     
     return True
+
+
+def convert_to_mp3(uploaded_file):
+    try:
+        # Generate a temporary file path for the uploaded file
+        temp_file_path = os.path.join("/tmp", uploaded_file.name)
+        
+        # Save the uploaded file to the temporary path
+        with open(temp_file_path, 'wb') as temp_file:
+            for chunk in uploaded_file.chunks():
+                temp_file.write(chunk)
+        
+        # Load the input audio file
+        audio = AudioSegment.from_file(temp_file_path)
+        
+        # Define the output MP3 file name
+        base_filename = os.path.splitext(uploaded_file.name)[0]
+        # output_mp3_file = os.path.join(settings.MEDIA_ROOT, f"{base_filename}.mp3")
+        output_mp3_file = f"{base_filename}.mp3"
+        
+        # Convert the audio to MP3 format
+        audio.export(output_mp3_file, format="mp3")
+        
+        print(f"Conversion successful: {uploaded_file.name} -> {output_mp3_file}")
+        
+        # Clean up the temporary file
+        os.remove(temp_file_path)
+        return output_mp3_file
+    except Exception as e:
+        print(f"Conversion failed: {str(e)}")
 
 
 
