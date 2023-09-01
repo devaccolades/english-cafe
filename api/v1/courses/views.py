@@ -1254,7 +1254,7 @@ def add_daily_topics(request):
                                 order_id = order_id,
                             )
 
-                            # transaction.commit()
+                            transaction.commit()
                             response_data = {
                                 "StatusCode" : 6000,
                                 "data" : {
