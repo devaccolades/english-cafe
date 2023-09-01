@@ -12,7 +12,7 @@ from general.functions import generate_serializer_errors, get_auto_id, assing_fi
 from courses.models import *
 from accounts.models import StudentProfile
 from api.v1.courses.serializers import *
-from api.v1.courses.functions import assign_next_topic
+from api.v1.courses.functions import assign_next_topic, convert_to_mp3
 
 
 @api_view(['GET'])
@@ -1233,9 +1233,12 @@ def add_daily_topics(request):
             day = request.data["day"]
             topic_type = request.data["topic_type"]
             order_id = request.data["order_id"]
-            file = request.data.get("file")
             audio_text = request.data.get("audio_text")
             text = request.data.get("text")
+            try:
+                file = request.FILES['file']
+            except:
+                file = None
 
             if (day := Day.objects.filter(pk=day, is_deleted=False)).exists():
                 day = day.latest("id")
@@ -1243,21 +1246,31 @@ def add_daily_topics(request):
                 if day.no_of_contents:
 
                     if topic_type == 'audio':
-                        daily_audio_topic = DailyAudioTopic.objects.create(
-                            auto_id = get_auto_id(DailyAudioTopic),
-                            day = day,
-                            audio = file,
-                            order_id = order_id,
-                        )
+                        try:
+                            to_mp3_file = convert_to_mp3(file)
+                            daily_audio_topic = DailyAudioTopic.objects.create(
+                                auto_id = get_auto_id(DailyAudioTopic),
+                                day = day,
+                                audio = to_mp3_file,
+                                order_id = order_id,
+                            )
 
-                        transaction.commit()
-                        response_data = {
-                            "StatusCode" : 6000,
-                            "data" : {
-                                "title" : "Success",
-                                "message" : "Daily audio topic updated"
+                            # transaction.commit()
+                            response_data = {
+                                "StatusCode" : 6000,
+                                "data" : {
+                                    "title" : "Success",
+                                    "message" : "Daily audio topic updated"
+                                }
                             }
-                        }
+                        except Exception as e:
+                            response_data = {
+                                "StatusCode" : 6001,
+                                "data" : {
+                                    "title" : "Conversion or saving failed",
+                                    "message" : str(e)
+                                }
+                            }
                     elif topic_type == 'text':
                         daily_text_topic = DailyTextTopic.objects.create(
                             auto_id = get_auto_id(DailyTextTopic),
