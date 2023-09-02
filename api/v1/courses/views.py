@@ -1482,7 +1482,13 @@ def edit_daily_topics(request, pk):
             daily_topics = daily_topics.latest("date_added")
 
             if file:
-                daily_topics.audio = file
+                try:
+                    to_mp3_file = convert_to_mp3(file)
+                    daily_topics.audio.save(os.path.basename(to_mp3_file), open(to_mp3_file, 'rb'))
+
+                except Exception as e:
+                    return Response({'app_data': str(e)}, status=status.HTTP_200_OK)
+                
             if order_id:
                 daily_topics.order_id = order_id
             
