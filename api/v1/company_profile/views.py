@@ -1334,8 +1334,8 @@ def create_enquiry(request):
                     message = message
                 )
 
-                subject = "Request for Enquiry"
-                content = "Request for Enquiry"
+                subject = "English Cafe Enquiry Data"
+                content = "Enquiry user details"
 
                 host_email = settings.EMAIL_HOST_USER
                 context = {
@@ -1354,7 +1354,7 @@ def create_enquiry(request):
                 try:
                     send_emails(host_email, subject, content, html_content)
                 except Exception as e:
-                    print("Helllllllllooooooo=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=")
+                    print(str(e),"-=-=-=-=-")
 
                 response_data = {
                     "StatusCode" : 6000,
