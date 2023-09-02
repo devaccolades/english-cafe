@@ -283,7 +283,7 @@ def send_emails(to_address, subject, content, html_content, attachment=None, att
         new_message.to_address = to_address
         if bcc_address:
             new_message.bcc_address = bcc_address
-        new_message.from_address = "Accolades Private Limites"
+        new_message.from_address = "English Cafe Enquiry Data"
         new_message.content = content
         new_message.html_content = html_content
         if attachment:
@@ -293,7 +293,7 @@ def send_emails(to_address, subject, content, html_content, attachment=None, att
         if attachment3:
             new_message.add_attachment(attachment3)
         new_message.app = "default"
-        print(new_message,"=-=-=-=-=-=-=-=-=-=-=-=-=-new_message")
+        print("Successs",)
         new_message.save()
     except Exception as e:
         print(str(e), "=-==-=-=-=-=-=-=-=-=-")
