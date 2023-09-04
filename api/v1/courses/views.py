@@ -1964,18 +1964,21 @@ def student_count(request):
             for programme in programmes:
                 if (student_profile := StudentProfile.objects.filter(programmes=programme)).exists():
                     student_profile_programme_count = student_profile.count()
+                else:
+                    student_profile_programme_count = 0
 
-                    count_obj = {
-                        "programme" : programme.name,
-                        "count" : student_profile_programme_count
-                    }
 
-                    count_data.append(count_obj)
+                count_obj = {
+                    "programme" : programme.name,
+                    "count" : student_profile_programme_count
+                }
 
-                    response_data = {
-                        "StatusCode" : 6000,
-                        "programme" : count_data
-                    }
+                count_data.append(count_obj)
+
+                response_data = {
+                    "StatusCode" : 6000,
+                    "programme" : count_data
+                }
 
     except Exception as e:
         transaction.rollback()
