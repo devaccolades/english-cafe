@@ -1960,7 +1960,7 @@ def student_count(request):
         count_data = []
         count_obj = {}
         if (programmes := Programme.objects.filter(is_deleted=False)).exists():
-
+            programmes = programmes.order_by("order_id")
             for programme in programmes:
                 if (student_profile := StudentProfile.objects.filter(programmes=programme)).exists():
                     student_profile_programme_count = student_profile.count()
