@@ -873,6 +873,7 @@ def mark_as_complete(request, pk):
                                             "StatusCode" : 6000,
                                             "data" : {
                                                 "title" : "Success",
+                                                "programme_status" : student_day.is_completed,
                                                 "message" : f"{programme} completed successfully"
                                             }
                                         }
