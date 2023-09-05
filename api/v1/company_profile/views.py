@@ -1261,7 +1261,7 @@ def get_enquiry(request):
                     "request" : request
                 },
                 many=True
-            ) 
+            ).data
 
             response_data = {
                 "StatusCode" : 6000,
