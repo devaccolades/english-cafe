@@ -869,6 +869,7 @@ def mark_as_complete(request, pk):
                                             }
 
                                     else:
+                                        transaction.commit()
                                         response_data = {
                                             "StatusCode" : 6000,
                                             "data" : {
@@ -961,18 +962,53 @@ def current_day(request):
         user = request.user
         if (student := StudentProfile.objects.filter(user=user, is_deleted=False)).exists():
             student = student.latest("date_added")
-
-            if (student_day := StudentDay.objects.filter(student=student, is_completed=False, status='ongoing')).exists():
+            Programme_complete_status = False
+            if (student_day := StudentDay.objects.filter(student=student, is_completed=False, status='ongoing', is_deleted=False)).exists():
                 student_day = student_day.latest("date_added")
                 current_day_id = student_day.day.id
+                programme = student_day.day.programme
 
                 response_data = {
                     "StatusCode" : 6000,
                     "data" : {
-                        "current_day_id" : current_day_id
+                        "current_day_id" : current_day_id,
+                        "Programme_complete_status": Programme_complete_status
                     }
                 }
 
+            elif (student_day := StudentDay.objects.filter(student=student, is_completed=True, status='completed', is_deleted=False)).exists():
+                student_day = student_day.latest("date_added")
+                current_day_id = student_day.day.id
+                programme = student_day.day.programme
+                day = Day.objects.get(pk=current_day_id, is_deleted=False)
+                day_number = day.day_number
+                next_day_number = int(day_number) + 1
+                if not (next_day := Day.objects.filter(programme=programme, day_number=next_day_number, is_deleted=False)).exists():
+                    if (student_day := StudentDay.objects.filter(student=student, day=day,is_completed=True, status='completed', is_deleted=False)).exists():
+                        Programme_complete_status = True
+                        response_data = {
+                            "StatusCode" : 6000,
+                            "data" : {
+                                "current_day_id" : current_day_id,
+                                "Programme_complete_status": Programme_complete_status
+                            }
+                        }
+                    else:
+                        response_data = {
+                            "StatusCode" : 6000,
+                            "data" : {
+                                "current_day_id" : current_day_id,
+                                "Programme_complete_status": Programme_complete_status
+                            }
+                        }
+                else:
+                    response_data = {
+                        "StatusCode" : 6000,
+                        "data" : {
+                            "current_day_id" : current_day_id,
+                            "Programme_complete_status": Programme_complete_status
+                        }
+                    }
             else:
                 response_data = {
                     "StatusCode" : 6001,
