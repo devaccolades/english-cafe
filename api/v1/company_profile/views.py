@@ -1349,6 +1349,7 @@ def create_enquiry(request):
                 except Exception as e:
                     print(str(e),"-=-=-=-=-")
 
+                transaction.commit()
                 response_data = {
                     "StatusCode" : 6000,
                     "data" : {
