@@ -421,12 +421,12 @@ def edit_students(request,pk):
                 programme = Programme.objects.get(pk=programme_id, is_deleted=False)
                 student.programmes = programme
                 
-                student_data = {
-                    "student_id" : student.id,
-                    "user_pk" : student.user.id
-                }
-                create_student_day_for_new_student(student_data,programme)
-                create_student_first_topic_for_a_new_student(student_data, programme)
+                # student_data = {
+                #     "student_id" : student.id,
+                #     "user_pk" : student.user.id
+                # }
+                # create_student_day_for_new_student(student_data,programme)
+                # create_student_first_topic_for_a_new_student(student_data, programme)
             
             student.save()
             transaction.commit()

@@ -1222,8 +1222,7 @@ def delete_programme(request, pk):
         transaction.set_autocommit(False)
         if (programme := Programme.objects.filter(pk=pk, is_deleted=False)).exists():
             programme = programme.latest("date_added")
-            programme.is_deleted = True
-            programme.save()
+            programme.delete()
 
             transaction.commit()
             response_data = {
@@ -1613,8 +1612,7 @@ def delete_daily_topics(request, pk):
         
         if (daily_topics := DailyAudioTopic.objects.filter(pk=pk, is_deleted=False)).exists():
             daily_topics = daily_topics.latest("date_added")
-            daily_topics.is_deleted = True
-            daily_topics.save()
+            daily_topics.delete()
             transaction.commit()
             response_data = {
                 "StatusCode" : 6000,
@@ -1623,8 +1621,7 @@ def delete_daily_topics(request, pk):
             }
         elif (daily_topics := DailyTextTopic.objects.filter(pk=pk, is_deleted=False)).exists():
             daily_topics = daily_topics.latest("date_added")
-            daily_topics.is_deleted = True
-            daily_topics.save()
+            daily_topics.delete()
             transaction.commit()
             response_data = {
                 "StatusCode" : 6000,
@@ -1633,8 +1630,7 @@ def delete_daily_topics(request, pk):
             }
         elif (daily_topics := DailyImageTopic.objects.filter(pk=pk, is_deleted=False)).exists():
             daily_topics = daily_topics.latest("date_added")
-            daily_topics.is_deleted = True
-            daily_topics.save()
+            daily_topics.delete()
             transaction.commit()
             response_data = {
                 "StatusCode" : 6000,
@@ -1643,8 +1639,7 @@ def delete_daily_topics(request, pk):
             }
         elif (daily_topics := DailyVideoTopic.objects.filter(pk=pk, is_deleted=False)).exists():
             daily_topics = daily_topics.latest("date_added")
-            daily_topics.is_deleted = True
-            daily_topics.save()
+            daily_topics.delete()
             transaction.commit()
             response_data = {
                 "StatusCode" : 6000,
