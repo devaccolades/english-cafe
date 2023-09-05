@@ -127,27 +127,34 @@ def create_student_profile(request):
                         programmes = programme
                     )
 
-                    student_data = {
-                        "student_id" : student_profile.id,
-                        "user_pk" : student_profile.user.id
-                    }
-
-                    create_student_day_for_new_student(student_data,programme)
-                    create_student_first_topic_for_a_new_student(student_data, programme)
-
-                    transaction.commit()
-
-                    response_data = {
-                        "StatusCode" : 6000,
-                        "credentials" : {
-                            "username" : username,
-                            "password" : password
-                        },
-                        "data" : {
-                            "title" : "Success",
-                            "message" : "Student profile created successfully"
+                    try:
+                        student_data = {
+                            "student_id" : student_profile.id,
+                            "user_pk" : student_profile.user.id
                         }
-                    }
+                        create_student_day_for_new_student(student_data,programme)
+                        create_student_first_topic_for_a_new_student(student_data, programme)
+
+                        transaction.commit()
+                        response_data = {
+                            "StatusCode" : 6000,
+                            "credentials" : {
+                                "username" : username,
+                                "password" : password
+                            },
+                            "data" : {
+                                "title" : "Success",
+                                "message" : "Student profile created successfully"
+                            }
+                        }
+                    except Exception as e:
+                        response_data = {
+                            "StatusCode" : 6001,
+                            "data" : {
+                                "title" : "Failed",
+                                "message" : str(e)
+                            }
+                        }
                 else:
                     response_data = {
                         "StatusCode" : 6001,
@@ -413,6 +420,13 @@ def edit_students(request,pk):
             if programme_id:
                 programme = Programme.objects.get(pk=programme_id, is_deleted=False)
                 student.programmes = programme
+                
+                # student_data = {
+                #     "student_id" : student.id,
+                #     "user_pk" : student.user.id
+                # }
+                # create_student_day_for_new_student(student_data,programme)
+                # create_student_first_topic_for_a_new_student(student_data, programme)
             
             student.save()
             transaction.commit()

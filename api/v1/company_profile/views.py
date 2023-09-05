@@ -239,8 +239,7 @@ def delete_achievements(request, pk):
         transaction.set_autocommit(False)
         if (achievements := Achievements.objects.filter(pk=pk, is_deleted=False)).exists():
             achievements = achievements.latest("date_added")
-            achievements.is_deleted = True
-            achievements.save()
+            achievements.delete()
 
             transaction.commit()
             response_data = {
@@ -551,9 +550,7 @@ def delete_testimonials(request, pk):
         transaction.set_autocommit(False)
         if (testimonial := Testimonials.objects.filter(pk=pk, is_deleted=False)).exists():
             testimonial = testimonial.latest("date_added")
-
-            testimonial.is_deleted = True
-            testimonial.save()
+            testimonial.delete()
 
             transaction.commit()
             response_data = {
@@ -840,9 +837,7 @@ def delete_our_team(request, pk):
 
         if (our_team := OurTeam.objects.filter(is_deleted=False)).exists():
             our_team = our_team.latest("date_added")
-
-            our_team.is_deleted =True
-            our_team.save()
+            our_team.delete()
 
             transaction.commit()
             response_data = {
@@ -990,9 +985,7 @@ def delete_careers(request, pk):
         transaction.set_autocommit(False)
         if (career :=  Career.objects.filter(pk=pk, is_deleted=False)).exists():
             career = career.latest("date_added")
-
-            career.is_deleted = True
-            career.save()
+            career.delete()
 
             transaction.commit()
             response_data = {
