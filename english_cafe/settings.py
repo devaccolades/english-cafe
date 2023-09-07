@@ -162,3 +162,43 @@ STATICFILES_DIRS = (
 # Default primary key field type
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+if not DEBUG:
+    LOGGING = {
+        'version': 1,
+        'disable_existing_loggers': False,
+        'filters': {
+            'require_debug_false': {
+                '()': 'django.utils.log.RequireDebugFalse'
+            }
+        },
+        'handlers': {
+            'mail_admins': {
+                'class': 'django.utils.log.AdminEmailHandler',
+                'level': 'ERROR',
+                'filters': ['require_debug_false'],
+                'include_html': True,
+            },
+            'logfile': {
+                'class': 'logging.handlers.WatchedFileHandler',
+                'filename': os.path.join(BASE_DIR, "log")
+            },
+        },
+        'loggers': {
+            'django.request': {
+                'handlers': ['mail_admins'],
+                'level': 'ERROR',
+                'propagate': True,
+            },
+            'django': {
+                'handlers': ['logfile'],
+                'level': 'ERROR',
+                'propagate': False,
+            },
+            'mailqueue': {
+                'handlers': ['logfile'],
+                'level': 'DEBUG',
+                'propagate': False
+            },
+        },
+    }
