@@ -36,7 +36,9 @@ SIMPLE_JWT = {
 
 DEBUG = env.bool("DEBUG", False)
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [ '*']
+
+CORS_ALLOW_ALL_ORIGINS = True
 
 
 # Application definition
@@ -45,6 +47,8 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework_simplejwt',
     "corsheaders",
+    'ckeditor',
+    'mailqueue',
 
     'django.contrib.admin',
     'django.contrib.auth',
@@ -55,6 +59,8 @@ INSTALLED_APPS = [
 
     'accounts',
     'general',
+    'courses',
+    'company_profile',
 ]
 
 MIDDLEWARE = [
@@ -75,7 +81,7 @@ ROOT_URLCONF = 'english_cafe.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': ['templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -126,6 +132,17 @@ USE_I18N = True
 
 USE_TZ = True
 
+EMAIL_USE_TLS = env('EMAIL_USE_TLS', cast=bool)
+EMAIL_HOST = env('EMAIL_HOST')
+EMAIL_HOST_USER = env('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD')
+EMAIL_PORT = env('EMAIL_PORT', cast=int)
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+
+DEFAULT_REPLY_TO_EMAIL = EMAIL_HOST_USER
+SERVER_EMAIL = EMAIL_HOST_USER
+ADMIN_EMAIL = EMAIL_HOST_USER
+
 
 # Static files (CSS, JavaScript, Images)
 
@@ -145,3 +162,43 @@ STATICFILES_DIRS = (
 # Default primary key field type
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+if not DEBUG:
+    LOGGING = {
+        'version': 1,
+        'disable_existing_loggers': False,
+        'filters': {
+            'require_debug_false': {
+                '()': 'django.utils.log.RequireDebugFalse'
+            }
+        },
+        'handlers': {
+            'mail_admins': {
+                'class': 'django.utils.log.AdminEmailHandler',
+                'level': 'ERROR',
+                'filters': ['require_debug_false'],
+                'include_html': True,
+            },
+            'logfile': {
+                'class': 'logging.handlers.WatchedFileHandler',
+                'filename': "/var/log/english_cafe/project.log"
+            },
+        },
+        'loggers': {
+            'django.request': {
+                'handlers': ['mail_admins'],
+                'level': 'ERROR',
+                'propagate': True,
+            },
+            'django': {
+                'handlers': ['logfile'],
+                'level': 'ERROR',
+                'propagate': False,
+            },
+            'mailqueue': {
+                'handlers': ['logfile'],
+                'level': 'DEBUG',
+                'propagate': False
+            },
+        },
+    }
