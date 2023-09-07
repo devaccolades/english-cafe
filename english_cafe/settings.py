@@ -181,7 +181,7 @@ if not DEBUG:
             },
             'logfile': {
                 'class': 'logging.handlers.WatchedFileHandler',
-                'filename': "/var/log/english_cafe/project.log"
+                'filename': os.path.join(BASE_DIR, "log")
             },
         },
         'loggers': {
