@@ -57,7 +57,7 @@ def chief_profile_login(request):
                     "StatusCode" : 6001,
                     "data" : {
                         "title" : "Failed",
-                        "message" : "Chief profile not exists"
+                        "message" : "Chief profile does not exists"
                     }
                 }
         else:

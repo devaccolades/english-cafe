@@ -296,9 +296,6 @@ class DailyAdminImageTopicSerializer(serializers.ModelSerializer):
             "order_id",
         )
 
-    
-    
-    
 class DailyAdminVideoTopicSerializer(serializers.ModelSerializer):
 
     class Meta:
@@ -309,8 +306,6 @@ class DailyAdminVideoTopicSerializer(serializers.ModelSerializer):
             "order_id",
         )
 
-    
-    
     
 class DailyAdminTextSerializer(serializers.ModelSerializer):
 

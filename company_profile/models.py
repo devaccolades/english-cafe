@@ -21,7 +21,7 @@ COMPANY_PROFILE_JOB_TYPE = (
 class Achievements(BaseModel):
     title = models.CharField(max_length=255)
     image = models.ImageField(upload_to="company-profile/images/", blank=True, null=True)
-    description = models.TextField()
+    description = models.TextField(blank=True, null=True)
 
     class Meta:
         db_table = 'company_profile_achievements'
