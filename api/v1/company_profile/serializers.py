@@ -68,7 +68,36 @@ class AddOurTeamSerializer(serializers.Serializer):
     name = serializers.CharField()
     photo = serializers.FileField()
     designation = serializers.CharField()
+    department = serializers.CharField()
     head = serializers.CharField()
+
+class OurTeamDepartmentSerializer(serializers.ModelSerializer):
+    team_members = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Department
+        fields = (
+            'id',
+            'name',
+            'team_members'
+        )
+
+    def get_team_members(self, instance):
+        request = self.context["request"]
+        if (our_team := OurTeam.objects.filter(department=instance.id, is_deleted=False)).exists():
+            our_team = our_team.order_by("-head")
+            serialized_data = OurTeamListSerializer(
+                our_team,
+                context = {
+                    "request" : request
+                },
+                many=True 
+            ).data
+
+            return serialized_data
+        else:
+            return None
+
 
 class OurTeamListSerializer(serializers.ModelSerializer):
     photo = serializers.SerializerMethodField()
@@ -80,6 +109,9 @@ class OurTeamListSerializer(serializers.ModelSerializer):
             'name',
             'photo',
             'designation',
+            'department',
+            'head'
+
 
         )
 
@@ -184,3 +216,13 @@ class AddCompanyCountSerializer(serializers.Serializer):
     languages_trainee = serializers.IntegerField()
     awards_won = serializers.IntegerField()
     courses = serializers.IntegerField()
+
+
+class ViewDepartMentSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Department
+        fields = (
+            'id',
+            'name'
+        )

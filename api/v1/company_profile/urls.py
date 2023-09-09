@@ -23,8 +23,10 @@ urlpatterns =[
     re_path(r'^testimonial/(?P<pk>.*)/$', views.single_testimonials, name="single-testimonials"),
     re_path(r'^delete-testimonial/(?P<pk>.*)/$', views.delete_testimonials, name="delete-testimonials"),
 
+    re_path(r'^get-department/$', views.get_department, name="get-department"),
     re_path(r'^add-our-team/$', views.add_our_team, name="add-our-team"),
     re_path(r'^get-our-team/$', views.get_our_team, name="get-our-team"),
+    re_path(r'^get-our-team-admin/$', views.get_our_team_admin, name="get-our-team-admin"),
     re_path(r'^our-team/(?P<pk>.*)/$', views.our_team, name="get-our-team"),
     re_path(r'^edit-our-team/(?P<pk>.*)/$', views.edit_our_team, name="edit-our-team"),
     re_path(r'^delete-our-team/(?P<pk>.*)/$', views.delete_our_team, name="delete-our-team"),
@@ -39,5 +41,7 @@ urlpatterns =[
     re_path(r'^add-company-profile-count/$', views.add_company_profile_count, name="add-company-profile-count"),
     re_path(r'^get-company-profile-count/$', views.get_company_profile_count, name="get-company-profile-count"),
     re_path(r'^edit-company-profile-count/(?P<pk>.*)/$', views.edit_company_profile_count, name="edit-company-profile-count"),
+
+     
 
 ]
