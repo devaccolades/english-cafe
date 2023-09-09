@@ -610,6 +610,7 @@ def get_department(request):
                 "StatusCode" : 6000,
                 "data" : serialized_data
             }
+        return Response({'app_data': response_data}, status=status.HTTP_200_OK)
     except  Exception as e:
         transaction.rollback()
         errType = e.__class__.__name__
@@ -624,7 +625,7 @@ def get_department(request):
             "response": errors
         }
 
-    return Response({'app_data': response_data}, status=status.HTTP_200_OK)
+        return Response({'app_data': response_data}, status=status.HTTP_200_OK)
 
     
 
