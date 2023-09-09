@@ -37,7 +37,7 @@ class Testimonials(BaseModel):
     name = models.CharField(max_length=255)
     quote = models.TextField()
     rating_count = models.PositiveIntegerField()
-    image = models.ImageField(upload_to="company_profile/testimonials/images")
+    image = models.ImageField(upload_to="company_profile/testimonials/images",  null=True, blank=True)
     video = models.FileField(upload_to="company_profile/testimonials/video")
 
     class Meta:
@@ -52,8 +52,9 @@ class Testimonials(BaseModel):
 
 class OurTeam(BaseModel):
     name = models.CharField(max_length=255)
-    photo = models.ImageField(upload_to="company_profile/our_team/photo")
-    designation = models.CharField(choices=COMPANY_PROFILE_JOB_DESIGNATION, max_length=255)
+    photo = models.ImageField(upload_to="company_profile/our_team/photo", null=True, blank=True)
+    designation = models.CharField(max_length=255)
+    head = models.BooleanField(default=False)
 
     class Meta:
         db_table = 'company_profile_our_team'
