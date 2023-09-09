@@ -4,7 +4,6 @@ from company_profile.models import *
 
 class AddAchievementsSerializer(serializers.Serializer):
     title = serializers.CharField()
-    description = serializers.CharField()
 
 
 class AchievementListSerializer(serializers.ModelSerializer):
