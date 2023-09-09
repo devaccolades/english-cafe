@@ -29,7 +29,7 @@ class AchievementListSerializer(serializers.ModelSerializer):
 class AddTestimonialSerializer(serializers.Serializer):
     name = serializers.CharField()
     quote = serializers.CharField()
-    image = serializers.FileField()
+    image = serializers.FileField(required=False)
     rating_count = serializers.CharField()
 
 
@@ -68,7 +68,7 @@ class AddOurTeamSerializer(serializers.Serializer):
     name = serializers.CharField()
     photo = serializers.FileField()
     designation = serializers.CharField()
-
+    head = serializers.CharField()
 
 class OurTeamListSerializer(serializers.ModelSerializer):
     photo = serializers.SerializerMethodField()
