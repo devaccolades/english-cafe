@@ -284,9 +284,12 @@ def add_testimonials(request):
         if serialized_data.is_valid():
             name = request.data["name"]
             quote = request.data["quote"]
-            image = request.data["image"]
             rating_count = request.data["rating_count"]
             video = request.data.get("video")
+            try:
+                image = request.data["image"]
+            except:
+                image = None
 
             if not Testimonials.objects.filter(name=name, quote=quote, image=image, rating_count=rating_count).exists():
 
