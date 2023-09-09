@@ -610,6 +610,14 @@ def get_department(request):
                 "StatusCode" : 6000,
                 "data" : serialized_data
             }
+        else:
+            response_data = {
+                "StatusCode" : 6001,
+                "data" : {
+                    "title" : "Failed",
+                    "message" : "Deaprtment not found"
+                }
+            }
         return Response({'app_data': response_data}, status=status.HTTP_200_OK)
     except  Exception as e:
         transaction.rollback()
