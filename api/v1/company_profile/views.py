@@ -25,7 +25,7 @@ def add_achievement(request):
         serialized_data = AddAchievementsSerializer(data=request.data)
         if serialized_data.is_valid():
             title = request.data["title"]
-            description = request.data["description"]
+            description = request.data.get("description")
             image = request.data.get("image")
 
             if not Achievements.objects.filter(title=title,description=description).exists():
