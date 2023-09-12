@@ -591,6 +591,52 @@ def delete_testimonials(request, pk):
         return Response({'app_data': response_data}, status=status.HTTP_200_OK)
     
 
+@api_view(['GET'])
+@group_required(['EnglishCafe'])
+def get_department(request):
+    try:
+        transaction.set_autocommit(False)
+        if (departments := Department.objects.filter(is_deleted=False)).exists():
+
+            serialized_data = ViewDepartMentSerializer(
+                departments,
+                context = {
+                    "request" : request,
+                },
+                many=True
+            ).data
+
+            response_data = {
+                "StatusCode" : 6000,
+                "data" : serialized_data
+            }
+        else:
+            response_data = {
+                "StatusCode" : 6001,
+                "data" : {
+                    "title" : "Failed",
+                    "message" : "Deaprtment not found"
+                }
+            }
+        return Response({'app_data': response_data}, status=status.HTTP_200_OK)
+    except  Exception as e:
+        transaction.rollback()
+        errType = e.__class__.__name__
+        errors = {
+            errType: traceback.format_exc()
+        }
+        response_data = {
+            "status": 0,
+            "api": request.get_full_path(),
+            "request": request.data,
+            "message": str(e),
+            "response": errors
+        }
+
+        return Response({'app_data': response_data}, status=status.HTTP_200_OK)
+
+    
+
 @api_view(['POST'])
 @group_required(['EnglishCafe'])
 def add_our_team(request):
@@ -601,22 +647,37 @@ def add_our_team(request):
             name = request.data["name"]
             photo = request.data["photo"]
             designation = request.data["designation"]
+            head = request.data["head"]
+            department = request.data["department"]
 
-            our_team = OurTeam.objects.create(
-                auto_id = get_auto_id(OurTeam),
-                name = name,
-                photo = photo,
-                designation = designation,
-            )
+            if (pannel := Department.objects.filter(pk=department, is_deleted=False)).exists():
+                pannel = pannel.latest("date_added")
 
-            transaction.commit()
-            response_data = {
-                "StatusCode" : 6000,
-                "data" : {
-                    "title" : "Success",
-                    "message" : "Our team added successfully"
+                our_team = OurTeam.objects.create(
+                    auto_id = get_auto_id(OurTeam),
+                    name = name,
+                    photo = photo,
+                    designation = designation,
+                    department = pannel,
+                    head = head,
+                )
+
+                transaction.commit()
+                response_data = {
+                    "StatusCode" : 6000,
+                    "data" : {
+                        "title" : "Success",
+                        "message" : "Our team added successfully"
+                    }
                 }
-            }
+            else:
+                response_data = {
+                    "StatusCode" : 6001,
+                    "data" : {
+                        "title" : "Failed",
+                        "message" : "Department not found"
+                    }
+                }
         else:
             response_data = {
                 "StatusCode" : 6001,
@@ -641,18 +702,53 @@ def add_our_team(request):
         }
 
         return Response({'app_data': response_data}, status=status.HTTP_200_OK)
-    
+
 
 @api_view(['GET'])
 @permission_classes([AllowAny,])
 def get_our_team(request):
     try:
         transaction.set_autocommit(False)
-        q = request.GET.get("q")
-        if (our_teams := OurTeam.objects.filter(is_deleted=False)).exists():
+        if (department := Department.objects.filter(is_deleted=False)).exists():
 
-            if q:
-                our_teams = OurTeam.objects.filter(Q(name__icontains=q) | Q(designation__icontains=q), is_deleted=False)
+            serialized_data = OurTeamDepartmentSerializer(
+                department,
+                context = {
+                    "request" : request
+                },
+                many = True
+            ).data
+
+            response_data = {
+                "StatusCode" : 6000,
+                "data" : serialized_data
+            }
+
+    except  Exception as e:
+        transaction.rollback()
+        errType = e.__class__.__name__
+        errors = {
+            errType: traceback.format_exc()
+        }
+        response_data = {
+            "status": 0,
+            "api": request.get_full_path(),
+            "request": request.data,
+            "message": str(e),
+            "response": errors
+        }
+
+    return Response({'app_data': response_data}, status=status.HTTP_200_OK)
+
+@api_view(['GET'])
+@permission_classes([AllowAny,])
+def get_our_team_admin(request):
+    try:
+        transaction.set_autocommit(False)
+        q = request.GET.get("q")
+        if q:
+            our_teams = OurTeam.objects.filter(Q(name__icontains=q) | Q(designation__icontains=q), is_deleted=False)
+        if (our_teams := OurTeam.objects.filter(is_deleted=False)).exists():
 
             paginator = Paginator(our_teams, 20)
             page = request.GET.get('page')

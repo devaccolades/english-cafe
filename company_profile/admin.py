@@ -42,3 +42,9 @@ class CompanyCountAdmin(admin.ModelAdmin):
     list_display = ('id', 'successfull_students', 'languages_trainee', 'awards_won', 'courses')
 
 admin.site.register(CompanyCount, CompanyCountAdmin)
+
+
+class DepartmentAdmin(admin.ModelAdmin):
+    list_display = ('id', 'name')
+
+admin.site.register(Department, DepartmentAdmin)

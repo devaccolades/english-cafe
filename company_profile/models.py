@@ -50,11 +50,25 @@ class Testimonials(BaseModel):
         return self.name
 
 
+class Department(BaseModel):
+    name = models.CharField(max_length=255, null=True, blank=True)
+
+    class Meta:
+        db_table = 'company_profile_deparment'
+        verbose_name = ('Department')
+        verbose_name_plural = ('Department')
+        ordering = ('id',)
+
+    def __str__(self):
+        return self.name
+
+
 class OurTeam(BaseModel):
     name = models.CharField(max_length=255)
-    photo = models.ImageField(upload_to="company_profile/our_team/photo", null=True, blank=True)
+    photo = models.FileField(upload_to="company_profile/our_team/photo", null=True, blank=True)
     designation = models.CharField(max_length=255)
     head = models.BooleanField(default=False)
+    department = models.ForeignKey("company_profile.Department", on_delete=models.CASCADE, null=True, blank=True)
 
     class Meta:
         db_table = 'company_profile_our_team'
