@@ -879,6 +879,8 @@ def edit_our_team(request, pk):
         name = request.data.get("name")
         photo = request.data.get("photo")
         designation = request.data.get("designation")
+        head = request.data.get("head")
+        department = request.data.get("department")
 
         if (our_team := OurTeam.objects.filter(pk=pk, is_deleted=False)).exists():
             our_team = our_team.latest("date_added")
@@ -889,6 +891,12 @@ def edit_our_team(request, pk):
                 our_team.photo = photo
             if designation:
                 our_team.designation = designation
+            if head:
+                our_team.head = head
+            if department:
+                if (instance := Department.objects.filter(pk=department, is_deleted=False)).exists():
+                    instance = instance.latest("date_added")
+                    our_team.department = instance
 
             our_team.save()
             transaction.commit()
@@ -896,7 +904,7 @@ def edit_our_team(request, pk):
             response_data = {
                 "StatusCode" : 6000,
                 "data" : {
-                    "title" : "Failed",
+                    "title" : "Success",
                     "message" : "Edit completed successfully"
                 }
             }
