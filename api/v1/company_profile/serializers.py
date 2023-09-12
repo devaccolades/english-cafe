@@ -101,6 +101,7 @@ class OurTeamDepartmentSerializer(serializers.ModelSerializer):
 
 class OurTeamListSerializer(serializers.ModelSerializer):
     photo = serializers.SerializerMethodField()
+    department = serializers.SerializerMethodField()
 
     class Meta:
         model = OurTeam
@@ -111,8 +112,6 @@ class OurTeamListSerializer(serializers.ModelSerializer):
             'designation',
             'department',
             'head'
-
-
         )
 
     def get_photo(self, instance):
@@ -122,6 +121,12 @@ class OurTeamListSerializer(serializers.ModelSerializer):
         else:
             return None
         
+    
+    def get_department(self, instance):
+        if instance.department:
+            return instance.department.name
+        else:
+            return None
 
 class AddCareerSerializer(serializers.Serializer):
     designation = serializers.CharField()
