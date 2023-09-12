@@ -1250,6 +1250,7 @@ def get_career_enquiry(request):
         transaction.set_autocommit(False)
         q = request.GET.get("q")
         if (career_enquiries := CareerEnquiry.objects.filter(is_deleted=False)).exists():
+            career_enquiries = career_enquiries.order_by("-date_added")
 
             if q:
                 career_enquiries = CareerEnquiry.objects.filter(Q(name__icontains=q) | Q(phone__icontains=q) | Q(job__designation__icontains=q), is_deleted=False)
