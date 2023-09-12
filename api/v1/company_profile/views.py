@@ -746,9 +746,9 @@ def get_our_team_admin(request):
     try:
         transaction.set_autocommit(False)
         q = request.GET.get("q")
-        if q:
-            our_teams = OurTeam.objects.filter(Q(name__icontains=q) | Q(designation__icontains=q), is_deleted=False)
         if (our_teams := OurTeam.objects.filter(is_deleted=False)).exists():
+            if q:
+                our_teams = OurTeam.objects.filter(Q(name__icontains=q) | Q(designation__icontains=q), is_deleted=False)
 
             paginator = Paginator(our_teams, 20)
             page = request.GET.get('page')
