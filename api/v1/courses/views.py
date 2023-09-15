@@ -780,164 +780,353 @@ def mark_as_complete(request, pk):
     try:
         transaction.set_autocommit(False)
         user = request.user
-        if (day := Day.objects.filter(pk=pk, is_deleted=False)).exists():
-            day = day.latest("id")
-            day_number = day.day_number
-            next_day_number = day_number + 1
+        if (student := StudentProfile.objects.filter(user=user, is_deleted=False)).exists():
+            student = student.latest("date_added")
+            if (day := Day.objects.filter(pk=pk, is_deleted=False)).exists():
+                day = day.latest("id")
+                number_of_contents_in_a_day = day.no_of_contents
+                programme = day.programme
+                day_number = day.day_number
+                next_day_number = int(day_number) + 1
 
-            if (student := StudentProfile.objects.filter(user=user, is_deleted=False)).exists():
-                student = student.latest("date_added")
-                programme = student.programmes
+                topics = []
+                for i in range(int(number_of_contents_in_a_day)):
 
-                if StudentDailyAudioTopic.objects.filter(daily_audio_topic__day=day, student_profile=student, is_completed=True, is_processed=True).exists():
-                    if StudentDailyVideoTopic.objects.filter(daily_video_topic__day=day, student_profile=student, is_completed=True, is_processed=True).exists():
-                        if StudentDailyTextTopic.objects.filter(daily_text_topic__day=day, student_profile=student, is_completed=True, is_processed=True).exists():
-                            if StudentDailyImageTopic.objects.filter(daily_image_topic__day=day, student_profile=student, is_completed=True, is_processed=True).exists():
+                    if (daily_audio_topics := DailyAudioTopic.objects.filter(day=day, order_id=int(i+1), is_deleted=False)).exists():
+                        daily_audio_topic_object = daily_audio_topics.latest("date_added")
+                        obj = {
+                            "type" : "audio",
+                            "id" : daily_audio_topic_object.id,
+                        }
 
-                                if (student_day := StudentDay.objects.filter(day=day, student__user=user, is_deleted=False)).exists():
-                                    student_day = student_day.latest("date_added")
-                                    student_day.status = 'completed'
-                                    student_day.is_completed = True
-                                    student_day.save()
+                        topics.append(obj)
+                    else:
+                        pass
 
-                                    next_day_number = int(day.day_number) + 1
-                                    if (next_day := Day.objects.filter(programme=programme, day_number=next_day_number)).exists():
-                                        next_day = next_day.latest("id")
+                    if (daily_video_topics := DailyVideoTopic.objects.filter(day=day, order_id=int(i+1), is_deleted=False)).exists():
+                        daily_video_topics_object = daily_video_topics.latest("date_added")
+                        obj = {
+                            "type" : "video",
+                            "id" : daily_video_topics_object.id,
+                        }
+                        topics.append(obj)
+                    else:
+                        pass
 
-                                        if not StudentDay.objects.filter(day=next_day, student=student).exists():
-                                            student_day = StudentDay.objects.create(
-                                                auto_id = get_auto_id(StudentDay),
-                                                day=next_day,
-                                                student=student,
-                                                status = 'ongoing',
-                                            )
+                    if (daily_image_topic := DailyImageTopic.objects.filter(day=day, order_id=int(i+1), is_deleted=False)).exists():
+                        daily_image_topic_objects = daily_image_topic.latest("date_added")
+                        obj = {
+                            "type" : "image",
+                            "id" : daily_image_topic_objects.id,
+                        }
+                        topics.append(obj)
+                    else:
+                        pass
 
-                                            student_data = {
-                                                "student_id" : student.id,
-                                                "user_pk" : student.user.id
-                                            }
+                    if (daily_text_topic := DailyTextTopic.objects.filter(day=day, order_id=int(i+1), is_deleted=False)).exists():
+                        daily_text_topic_object = daily_text_topic.latest("date_added")
+                        obj = {
+                            "type" : "text",
+                            "id" : daily_text_topic_object.id,
+                        }
+                        topics.append(obj)
+                    else:
+                        pass
+                
+                last_topic_of_current_day = topics[-1]
+                last_topic_type = last_topic_of_current_day['type']
+                last_topic_id = last_topic_of_current_day['id']
 
-                                            # if (next_day := Day.objects.filter(programme=programme, day_number=next_day_number)).exists():
-                                            #     next_day = next_day.latest("id")
+                if last_topic_type == 'audio':
+                    if StudentDailyAudioTopic.objects.filter(daily_audio_topic__id=last_topic_id, student_profile=student, is_processed=True, is_completed=True, is_deleted=False).exists():
 
-                                            assing_first_topic_of_a_day(student_data, programme, next_day_number)
+                        if (current_day := StudentDay.objects.filter(day=day, student=student, is_completed=False, is_deleted=False)).exists():
+                            current_day = current_day.latest("date_added")
+                            current_day.status = 'completed'
+                            current_day.is_completed = True
+                            current_day.save()
 
-                                            transaction.commit()
-                                            response_data = {
-                                                "StatusCode" : 6000,
-                                                "data" : {
-                                                    "title" : "Success",
-                                                    "message" : "Successfully completed the current day",
-                                                    "next_day_id" : next_day.id
-                                                }
-                                            }
-                                            # else:
-                                            #     if (last_day := Day.objects.filter(programme=programme, is_deleted=False)).exists():
-                                            #         last_day = last_day.latest("day_number")
+                            if (next_day := Day.objects.filter(day_number=next_day_number, programme=programme, is_deleted=False)).exists():
+                                next_day = next_day.latest("id")
 
-                                            #         if next_day_number == last_day.day_number:
-                                                        
-                                            #             if (last_student_day := StudentDay.objects.filter(day=last_day, student=student, is_complete=True, status='completed')).exists():
+                                if not StudentDay.objects.filter(day=next_day, student=student, is_deleted=False).exists():
+                                    student_next_day = StudentDay.objects.create(
+                                        auto_id = get_auto_id(StudentDay),
+                                        day = next_day,
+                                        student = student,
+                                        status = 'ongoing',
 
-                                            #                 response_data = {
-                                            #                     "StatusCode" : 6000,
-                                            #                     "data" : {
-                                            #                         "title" : "Success",
-                                            #                         "message" : f"{programme} completed successfully"
-                                            #                     }
-                                            #                 }
-                                            #             else:
-                                            #                 pass
-                                            #         else:
-                                            #             pass
-                                            #     else:
-                                            #         response_data = {
-                                            #             "StatusCode" : 6001,
-                                            #             "data" : {
-                                            #                 "title" : "Failed",
-                                            #                 "message" : "An error occured"
-                                            #             }
-                                            #         }
+                                    )
 
-                                        else:
-                                            response_data = {
-                                                "StatusCode" : 6001,
-                                                "data" : {
-                                                    "title" : "Failed",
-                                                    "message" : "Student day already exists"
-                                                }
-                                            }
+                                    student_data = {
+                                        "student_id" : student.id,
+                                        "user_pk" : student.user.id
+                                    }
 
-                                    else:
-                                        transaction.commit()
-                                        response_data = {
-                                            "StatusCode" : 6000,
-                                            "data" : {
-                                                "title" : "Success",
-                                                "programme_status" : student_day.is_completed,
-                                                "message" : f"{programme} completed successfully"
-                                            }
+                                    assing_first_topic_of_a_day(student_data, programme, next_day_number)
+                                    transaction.commit()
+                                    response_data = {
+                                        "StatusCode" : 6000,
+                                        "data" : {
+                                            "title" : "Success",
+                                            "message" : "Successfully completed the current day",
+                                            "next_day_id" : next_day.id
                                         }
+                                    }
                                 else:
                                     response_data = {
                                         "StatusCode" : 6001,
                                         "data" : {
                                             "title" : "Failed",
-                                            "message" : "Student day not found"
+                                            "message" : "Student day already exists"
                                         }
                                     }
                             else:
+                                transaction.commit()
                                 response_data = {
-                                    "StatusCode" : 6001,
+                                    "StatusCode" : 6000,
                                     "data" : {
-                                    "title" : "Failed",
-                                    "message" : "Student daily image topic not complete"
+                                        "title" : "Success",
+                                        "message" : f"{programme} completed successfully"
+                                    }
                                 }
-                            }
                         else:
                             response_data = {
-                            "StatusCode" : 6001,
-                            "data" : {
-                                "title" : "Failed",
-                                "message" : "Student daily text topic not complete"
+                                "StatusCode" : 6001,
+                                "data" : {
+                                    "title" : "Failed",
+                                    "message" : "Current student day not found"
+                                }
                             }
-                        }
                     else:
                         response_data = {
                             "StatusCode" : 6001,
                             "data" : {
                                 "title" : "Failed",
-                                "message" : "Student daily video topic not complete"
+                                "message" : "Topic is not fully completed"
                             }
                         }
-                else:
-                    response_data = {
-                        "StatusCode" : 6001,
-                        "data" : {
-                            "title" : "Failed",
-                            "message" : "Student daily audio topic not complete"
+                elif last_topic_type == 'video':
+                    if StudentDailyVideoTopic.objects.filter(daily_video_topic__id=last_topic_id, student_profile=student, is_processed=True, is_completed=True, is_deleted=False).exists():
+
+                        if (current_day := StudentDay.objects.filter(day=day, student=student, is_completed=False, is_deleted=False)).exists():
+                            current_day = current_day.latest("date_added")
+                            current_day.status = 'completed'
+                            current_day.is_completed = True
+                            current_day.save()
+
+                            if (next_day := Day.objects.filter(day_number=next_day_number, programme=programme, is_deleted=False)).exists():
+                                next_day = next_day.latest("id")
+
+                                if not StudentDay.objects.filter(day=next_day, student=student, is_deleted=False).exists():
+                                    student_next_day = StudentDay.objects.create(
+                                        auto_id = get_auto_id(StudentDay),
+                                        day = next_day,
+                                        student = student,
+                                        status = 'ongoing',
+                                    )
+
+                                    student_data = {
+                                        "student_id" : student.id,
+                                        "user_pk" : student.user.id
+                                    }
+
+                                    assing_first_topic_of_a_day(student_data, programme, next_day_number)
+                                    transaction.commit()
+                                    response_data = {
+                                        "StatusCode" : 6000,
+                                        "data" : {
+                                            "title" : "Success",
+                                            "message" : "Successfully completed the current day",
+                                            "next_day_id" : next_day.id
+                                        }
+                                    }
+                                else:
+                                    response_data = {
+                                        "StatusCode" : 6001,
+                                        "data" : {
+                                            "title" : "Failed",
+                                            "message" : "Student day already exists"
+                                        }
+                                    }
+                            else:
+                                transaction.commit()
+                                response_data = {
+                                    "StatusCode" : 6000,
+                                    "data" : {
+                                        "title" : "Success",
+                                        "message" : f"{programme} completed successfully"
+                                    }
+                                }
+                        else:
+                            response_data = {
+                                "StatusCode" : 6001,
+                                "data" : {
+                                    "title" : "Failed",
+                                    "message" : "Current student day not found"
+                                }
+                            }
+                    else:
+                        response_data = {
+                            "StatusCode" : 6001,
+                            "data" : {
+                                "title" : "Failed",
+                                "message" : "Topic is not fully completed"
+                            }
+                        }  
+                elif last_topic_type == 'image':
+                    if StudentDailyImageTopic.objects.filter(daily_image_topic__id=last_topic_id, student_profile=student, is_processed=True, is_completed=True, is_deleted=False).exists():
+
+                        if (current_day := StudentDay.objects.filter(day=day, student=student, is_completed=False, is_deleted=False)).exists():
+                            current_day = current_day.latest("date_added")
+                            current_day.status = 'completed'
+                            current_day.is_completed = True
+                            current_day.save()
+
+                            if (next_day := Day.objects.filter(day_number=next_day_number, programme=programme, is_deleted=False)).exists():
+                                next_day = next_day.latest("id")
+
+                                if not StudentDay.objects.filter(day=next_day, student=student, is_deleted=False).exists():
+                                    student_next_day = StudentDay.objects.create(
+                                        auto_id = get_auto_id(StudentDay),
+                                        day = next_day,
+                                        student = student,
+                                        status = 'ongoing',
+
+                                    )
+
+                                    student_data = {
+                                        "student_id" : student.id,
+                                        "user_pk" : student.user.id
+                                    }
+
+                                    assing_first_topic_of_a_day(student_data, programme, next_day_number)
+                                    transaction.commit()
+                                    response_data = {
+                                        "StatusCode" : 6000,
+                                        "data" : {
+                                            "title" : "Success",
+                                            "message" : "Successfully completed the current day",
+                                            "next_day_id" : next_day.id
+                                        }
+                                    }
+                                else:
+                                    response_data = {
+                                        "StatusCode" : 6001,
+                                        "data" : {
+                                            "title" : "Failed",
+                                            "message" : "Student day already exists"
+                                        }
+                                    }
+                            else:
+                                transaction.commit()
+                                response_data = {
+                                    "StatusCode" : 6000,
+                                    "data" : {
+                                        "title" : "Success",
+                                        "message" : f"{programme} completed successfully"
+                                    }
+                                }
+                        else:
+                            response_data = {
+                                "StatusCode" : 6001,
+                                "data" : {
+                                    "title" : "Failed",
+                                    "message" : "Current student day not found"
+                                }
+                            }
+                    else:
+                        response_data = {
+                            "StatusCode" : 6001,
+                            "data" : {
+                                "title" : "Failed",
+                                "message" : "Topic is not fully completed"
+                            }
                         }
-                    }
+                elif last_topic_type == 'text':
+                    if StudentDailyTextTopic.objects.filter(daily_text_topic__id=last_topic_id, student_profile=student, is_processed=True, is_completed=True, is_deleted=False).exists():
+                        if (current_day := StudentDay.objects.filter(day=day, student=student, is_completed=False, is_deleted=False)).exists():
+                            current_day = current_day.latest("date_added")
+                            current_day.status = 'completed'
+                            current_day.is_completed = True
+                            current_day.save()
+
+                            if (next_day := Day.objects.filter(day_number=next_day_number, programme=programme, is_deleted=False)).exists():
+                                next_day = next_day.latest("id")
+
+                                if not StudentDay.objects.filter(day=next_day, student=student, is_deleted=False).exists():
+                                    student_next_day = StudentDay.objects.create(
+                                        auto_id = get_auto_id(StudentDay),
+                                        day = next_day,
+                                        student = student,
+                                        status = 'ongoing',
+
+                                    )
+
+                                    student_data = {
+                                        "student_id" : student.id,
+                                        "user_pk" : student.user.id
+                                    }
+
+                                    assing_first_topic_of_a_day(student_data, programme, next_day_number)
+                                    transaction.commit()
+                                    response_data = {
+                                        "StatusCode" : 6000,
+                                        "data" : {
+                                            "title" : "Success",
+                                            "message" : "Successfully completed the current day",
+                                            "next_day_id" : next_day.id
+                                        }
+                                    }
+                                else:
+                                    response_data = {
+                                        "StatusCode" : 6001,
+                                        "data" : {
+                                            "title" : "Failed",
+                                            "message" : "Student day already exists"
+                                        }
+                                    }
+                            else:
+                                transaction.commit()
+                                response_data = {
+                                    "StatusCode" : 6000,
+                                    "data" : {
+                                        "title" : "Success",
+                                        "message" : f"{programme} completed successfully"
+                                    }
+                                }
+                        else:
+                            response_data = {
+                                "StatusCode" : 6001,
+                                "data" : {
+                                    "title" : "Failed",
+                                    "message" : "Current student day not found"
+                                }
+                            }
+                    else:
+                        response_data = {
+                            "StatusCode" : 6001,
+                            "data" : {
+                                "title" : "Failed",
+                                "message" : "Topic is not fully completed"
+                            }
+                        }
             else:
                 response_data = {
-                    "StatusCode" : 6000,
+                    "StatusCode" : 6001,
                     "data" : {
                         "title" : "Failed",
-                        "message" : "Student not found"
+                        "message" : "Day not found"
                     }
                 }
-
         else:
             response_data = {
                 "StatusCode" : 6001,
                 "data" : {
                     "title" : "Failed",
-                    "message" : "Day not found"
+                    "message" : "Student not found"
                 }
             }
-
-        return Response({'app_data': response_data}, status=status.HTTP_200_OK)
-
     except Exception as e:
         transaction.rollback()
         errType = e.__class__.__name__
