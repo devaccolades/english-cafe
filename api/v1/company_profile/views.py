@@ -1538,7 +1538,7 @@ def get_gallery(request):
 
 
 @api_view(['GET'])
-@group_required(['Student'])
+@permission_classes([AllowAny,])
 def get_youtube_links(request):
     try:
         transaction.set_autocommit(False)
