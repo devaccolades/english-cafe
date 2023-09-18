@@ -1707,7 +1707,7 @@ def edit_company_profile_count(request, pk):
 
 @api_view(['POST'])
 @group_required(['EnglishCafe'])
-def add_gallery(request):
+def add_gallery_image(request):
     try:
         transaction.set_autocommit(False)
         serialized_data = AddGallerySerializer(data=request.data)
@@ -1780,6 +1780,50 @@ def add_gallery(request):
                 }
             }
 
+    except  Exception as e:
+        transaction.rollback()
+        errType = e.__class__.__name__
+        errors = {
+            errType: traceback.format_exc()
+        }
+        response_data = {
+            "status": 0,
+            "api": request.get_full_path(),
+            "request": request.data,
+            "message": str(e),
+            "response": errors
+        }
+
+    return Response({'app_data': response_data}, status=status.HTTP_200_OK)
+
+
+@api_view(['POST'])
+@group_required(['EnglishCafe'])
+def delete_gallery_image(request, pk):
+    try:
+        transaction.set_autocommit(False)
+        if (gallery := Gallery.objects.filter(pk=pk, is_deleted=False)).exists():
+            gallery = gallery.latest("date_added")
+            gallery.delete()
+            gallery.save()
+
+            transaction.commit()
+            response_data = {
+                "StatusCode" : 6000,
+                "data" : {
+                    "title" : "Success",
+                    "message" : "Gallery deleted successfully"
+                }
+            }
+
+        else:
+            response_data = {
+                "StatusCode" : 6001,
+                "data" : {
+                    "title" : "Failed",
+                    "message" : "Gallery not found"
+                }
+            }
     except  Exception as e:
         transaction.rollback()
         errType = e.__class__.__name__
