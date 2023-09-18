@@ -18,6 +18,23 @@ COMPANY_PROFILE_JOB_TYPE = (
     ('part_timr', 'Part Time')
 )
 
+COMPANY_PROFILE_GALLERY_TYPE = (
+    ('image', 'Image'),
+    ('video', 'video'),
+    ('link', 'Link')
+)
+
+COMPANY_PROFILE_GALLERY_SLOT = (
+    ('slot_1', 'Slot 1'),
+    ('slot_2', 'Slot 2'),
+    ('slot_3', 'Slot 3'),
+    ('slot_4', 'Slot 4'),
+    ('slot_5', 'Slot 5'),
+    ('slot_6', 'Slot 6'),
+    ('slot_7', 'Slot 7'),
+    ('slot_8', 'Slot 8'),
+)
+
 class Achievements(BaseModel):
     title = models.CharField(max_length=255)
     image = models.ImageField(upload_to="company-profile/images/", blank=True, null=True)
@@ -142,3 +159,21 @@ class CompanyCount(BaseModel):
     
     def __str__(self):
         return str(self.successfull_students)
+    
+
+class Gallery(BaseModel):
+    type = models.CharField(choices=COMPANY_PROFILE_GALLERY_TYPE, max_length=255)
+    file = models.FileField(upload_to='company_profile/gallery/', null=True, blank=True)
+    file_link = models.CharField(max_length=255, null=True, blank=True)
+    slot = models.CharField(choices=COMPANY_PROFILE_GALLERY_SLOT, max_length=122, null=True, blank=True)
+    
+    class Meta:
+        db_table = 'courses_gallery'
+        verbose_name = ('Gallery')
+        verbose_name_plural = ('Galleries')
+        ordering = ('id',)
+
+    def __str__(self):
+        return self.type
+
+
