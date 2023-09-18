@@ -1499,7 +1499,7 @@ def create_enquiry(request):
 
 
 @api_view(['GET'])
-@group_required(['Student'])
+@permission_classes([AllowAny,])
 def get_gallery(request):
     try:
         transaction.set_autocommit(False)
