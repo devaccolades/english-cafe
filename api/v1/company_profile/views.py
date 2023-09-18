@@ -1504,13 +1504,13 @@ def get_gallery(request):
     try:
         transaction.set_autocommit(False)
         if (gallery_images := Gallery.objects.filter(type='image')).exists():
-            gallery_images_obj = {}
+            gallery_images_array = []
             for gallery_image in gallery_images:
-                gallery_images_obj[gallery_image.slot] = request.build_absolute_uri(gallery_image.file.url)
-
+                gallery_images_array.append(request.build_absolute_uri(gallery_image.file.url))
+            
             response_data = {
                 "StatusCode" : 6000,
-                "data" : gallery_images_obj
+                "data" : gallery_images_array
             }
         else:
             response_data = {
