@@ -15,7 +15,6 @@ class AchievementListSerializer(serializers.ModelSerializer):
             'id',
             'title',
             'image',
-            'description',
         )
 
     def get_image(self, instance):
