@@ -257,3 +257,15 @@ class ViewGalleryYoutubeLinksSerializer(serializers.ModelSerializer):
             'file_link'
         )
 
+
+class AdminListGallerySerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Gallery
+        fields = (
+            'id',
+            'type',
+            'file',
+            'file_link'
+        )
+

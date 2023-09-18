@@ -45,5 +45,6 @@ urlpatterns =[
     re_path(r'^edit-company-profile-count/(?P<pk>.*)/$', views.edit_company_profile_count, name="edit-company-profile-count"),
 
     re_path(r'^add-gallery-image/$', views.add_gallery_image, name="add-gallery"),
+    re_path(r'^get-galleries-admin/$', views.get_galleries, name="get-gallery"),
     re_path(r'^delete-gallery-image/(?P<pk>.*)/$', views.delete_gallery_image, name="delete-gallery"),
 ]
