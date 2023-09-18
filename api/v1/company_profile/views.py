@@ -1538,6 +1538,51 @@ def get_gallery(request):
     return Response({'app_data': response_data}, status=status.HTTP_200_OK)
 
 
+@api_view(['GET'])
+@group_required(['Student'])
+def get_youtube_links(request):
+    try:
+        transaction.set_autocommit(False)
+        if (links := Gallery.objects.filter(type='link', is_deleted=False)).exists():
+
+            serialized_data = ViewGalleryYoutubeLinksSerializer(
+                links,
+                context = {
+                    "request" : request
+                },
+                many=True
+            ).data
+
+            response_data = {
+                "StatusCode" : 6000,
+                "data" : serialized_data
+            }
+        else:
+            response_data = {
+                "StatusCode" : 6001,
+                "data" : {
+                    "title" : "Failed",
+                    "message" : "Video link not found"
+                }
+            }
+    except  Exception as e:
+        transaction.rollback()
+        errType = e.__class__.__name__
+        errors = {
+            errType: traceback.format_exc()
+        }
+        response_data = {
+            "status": 0,
+            "api": request.get_full_path(),
+            "request": request.data,
+            "message": str(e),
+            "response": errors
+        }
+
+    return Response({'app_data': response_data}, status=status.HTTP_200_OK)
+
+
+
 @api_view(['POST'])
 @group_required(['EnglishCafe'])
 def add_company_profile_count(request):
