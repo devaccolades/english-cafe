@@ -1507,7 +1507,6 @@ def get_gallery(request):
             gallery_images_array = []
             for gallery_image in gallery_images:
                 gallery_images_array.append(request.build_absolute_uri(gallery_image.file.url))
-            
             response_data = {
                 "StatusCode" : 6000,
                 "data" : gallery_images_array
@@ -1850,7 +1849,6 @@ def delete_gallery_image(request, pk):
         if (gallery := Gallery.objects.filter(pk=pk, is_deleted=False)).exists():
             gallery = gallery.latest("date_added")
             gallery.delete()
-            gallery.save()
 
             transaction.commit()
             response_data = {
