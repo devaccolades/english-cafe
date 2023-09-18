@@ -10,6 +10,7 @@ urlpatterns =[
     re_path(r'^company-count-data/$', views.company_count_data, name="company-count-data"),
     re_path(r'^create-enquiry-email/$', views.create_enquiry, name="send-email"),
     re_path(r'^get-galley/$', views.get_gallery, name="get-gallery"),
+    re_path(r'^get-youtube-links/$', views.get_youtube_links, name="get-youtube-links"),
 
     # ================admin================
     re_path(r'^add-achievement/$', views.add_achievement, name="add-achievement"),

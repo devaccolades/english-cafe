@@ -237,7 +237,6 @@ class AddGallerySerializer(serializers.Serializer):
 
 
 class ViewGalleryImageSerializer(serializers.ModelSerializer):
-    slot_1 = serializers.SerializerMethodField()
 
     class Meta:
         model = Gallery
@@ -245,13 +244,16 @@ class ViewGalleryImageSerializer(serializers.ModelSerializer):
             'id',
             'type',
             'file',
-            'slot'
         )
+        
 
-    def get_slot_1(self,instance):
-        request = self.context['request']
-        if instance.file:
-            return request.build_absolute_uri(instance.file.url)
-        else:
-            return None
+class ViewGalleryYoutubeLinksSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Gallery
+        fields = (
+            'id',
+            'type',
+            'file_link'
+        )
 
