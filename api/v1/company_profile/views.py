@@ -1886,6 +1886,51 @@ def delete_gallery_image(request, pk):
     return Response({'app_data': response_data}, status=status.HTTP_200_OK)
 
 
+@api_view(['GET'])
+@group_required(['EnglishCafe'])
+def get_galleries(request):
+    try:
+        if (galleries := Gallery.objects.filter(is_deleted=False)).exists():
+
+            serialized_data = AdminListGallerySerializer(
+                galleries,
+                context = {
+                    "request" : request
+                },
+                many=True
+            ).data
+
+            response_data = {
+                "StatusCode" : 6000,
+                "data" : serialized_data
+            }
+        else:
+            response_data = {
+                "StatusCode" : 6001,
+                "data" : {
+                    "title" : "Failed",
+                    "message" : "Gallery not found"
+                }
+            }
+
+    except  Exception as e:
+        transaction.rollback()
+        errType = e.__class__.__name__
+        errors = {
+            errType: traceback.format_exc()
+        }
+        response_data = {
+            "status": 0,
+            "api": request.get_full_path(),
+            "request": request.data,
+            "message": str(e),
+            "response": errors
+        }
+
+    return Response({'app_data': response_data}, status=status.HTTP_200_OK)
+
+
+
     
 
 
