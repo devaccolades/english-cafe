@@ -1498,6 +1498,46 @@ def create_enquiry(request):
     return Response({'app_data': response_data}, status=status.HTTP_200_OK)
 
 
+@api_view(['GET'])
+@group_required(['Student'])
+def get_gallery(request):
+    try:
+        transaction.set_autocommit(False)
+        if (gallery_images := Gallery.objects.filter(type='image')).exists():
+            gallery_images_obj = {}
+            for gallery_image in gallery_images:
+                gallery_images_obj[gallery_image.slot] = request.build_absolute_uri(gallery_image.file.url)
+
+            response_data = {
+                "StatusCode" : 6000,
+                "data" : gallery_images_obj
+            }
+        else:
+            response_data = {
+                "StatusCode" : 6001,
+                "data" : {
+                    "title" : "Failed",
+                    "message" : "Gallery not found"
+                }
+            }
+
+    except  Exception as e:
+        transaction.rollback()
+        errType = e.__class__.__name__
+        errors = {
+            errType: traceback.format_exc()
+        }
+        response_data = {
+            "status": 0,
+            "api": request.get_full_path(),
+            "request": request.data,
+            "message": str(e),
+            "response": errors
+        }
+
+    return Response({'app_data': response_data}, status=status.HTTP_200_OK)
+
+
 @api_view(['POST'])
 @group_required(['EnglishCafe'])
 def add_company_profile_count(request):
@@ -1663,6 +1703,99 @@ def edit_company_profile_count(request, pk):
         }
 
     return Response({'app_data': response_data}, status=status.HTTP_200_OK)
+
+
+@api_view(['POST'])
+@group_required(['EnglishCafe'])
+def add_gallery(request):
+    try:
+        transaction.set_autocommit(False)
+        serialized_data = AddGallerySerializer(data=request.data)
+        if serialized_data.is_valid():
+            gallery_type = request.data["type"]
+            file = request.data.get("file")
+            file_link = request.data.get("file_link")
+            slot = request.data.get("slot")
+
+            if gallery_type == 'image':
+                gallery = Gallery.objects.create(
+                    auto_id = get_auto_id(Gallery),
+                    type = gallery_type,
+                    file = file,
+                    slot = slot
+                )
+
+                transaction.commit()
+                response_data = {
+                    "StatusCode" : 6000,
+                    "data" : {
+                        "title" : "Success",
+                        "message" : "Image added Successfully"
+                    }
+                }
+            elif gallery_type == 'video':
+                gallery = Gallery.objects.create(
+                    auto_id = get_auto_id(Gallery),
+                    type = gallery_type,
+                    file = file
+                )
+
+                transaction.commit()
+                response_data = {
+                    "StatusCode" : 6000,
+                    "data" : {
+                        "title" : "Success",
+                        "message" : "Video added Successfully"
+                    }
+                }
+            elif gallery_type == 'link':
+                gallery = Gallery.objects.create(
+                    auto_id = get_auto_id(Gallery),
+                    type = gallery_type,
+                    file_link = file_link
+                )
+
+                transaction.commit()
+                response_data = {
+                    "StatusCode" : 6000,
+                    "data" : {
+                        "title" : "Success",
+                        "message" : "Video link added Successfully"
+                    }
+                }
+            else:
+                response_data = {
+                    "StatusCode" : 6001,
+                    "data" : {
+                        "title" : "Failed",
+                        "message" : "Gallery type not found"
+                    }
+                }
+        else:
+            response_data = {
+                "StatusCode" : 6001,
+                "data" : {
+                    "title" : "Failed",
+                    "message" : generate_serializer_errors(serialized_data._errors)
+                }
+            }
+
+    except  Exception as e:
+        transaction.rollback()
+        errType = e.__class__.__name__
+        errors = {
+            errType: traceback.format_exc()
+        }
+        response_data = {
+            "status": 0,
+            "api": request.get_full_path(),
+            "request": request.data,
+            "message": str(e),
+            "response": errors
+        }
+
+    return Response({'app_data': response_data}, status=status.HTTP_200_OK)
+
 
     
 

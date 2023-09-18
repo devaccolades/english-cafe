@@ -48,3 +48,9 @@ class DepartmentAdmin(admin.ModelAdmin):
     list_display = ('id', 'name')
 
 admin.site.register(Department, DepartmentAdmin)
+
+
+class GalleryAdmin(admin.ModelAdmin):
+    list_display = ('id', 'type', 'file', 'file_link')
+
+admin.site.register(Gallery, GalleryAdmin)

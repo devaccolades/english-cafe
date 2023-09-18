@@ -231,3 +231,28 @@ class ViewDepartMentSerializer(serializers.ModelSerializer):
             'id',
             'name'
         )
+
+
+class AddGallerySerializer(serializers.Serializer):
+    type = serializers.CharField()
+
+
+class ViewGalleryImageSerializer(serializers.ModelSerializer):
+    slot_1 = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Gallery
+        fields = (
+            'id',
+            'type',
+            'file',
+            'slot'
+        )
+
+    def get_slot_1(self,instance):
+        request = self.context['request']
+        if instance.file:
+            return request.build_absolute_uri(instance.file.url)
+        else:
+            return None
+
