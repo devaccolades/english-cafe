@@ -15,7 +15,6 @@ class AchievementListSerializer(serializers.ModelSerializer):
             'id',
             'title',
             'image',
-            'description',
         )
 
     def get_image(self, instance):
@@ -231,3 +230,42 @@ class ViewDepartMentSerializer(serializers.ModelSerializer):
             'id',
             'name'
         )
+
+
+class AddGallerySerializer(serializers.Serializer):
+    type = serializers.CharField()
+
+
+class ViewGalleryImageSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Gallery
+        fields = (
+            'id',
+            'type',
+            'file',
+        )
+        
+
+class ViewGalleryYoutubeLinksSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Gallery
+        fields = (
+            'id',
+            'type',
+            'file_link'
+        )
+
+
+class AdminListGallerySerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Gallery
+        fields = (
+            'id',
+            'type',
+            'file',
+            'file_link'
+        )
+

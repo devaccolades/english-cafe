@@ -9,6 +9,8 @@ urlpatterns =[
     re_path(r'^create-career-enquiry/$', views.create_career_enquiry, name="add-career-enquiry"),
     re_path(r'^company-count-data/$', views.company_count_data, name="company-count-data"),
     re_path(r'^create-enquiry-email/$', views.create_enquiry, name="send-email"),
+    re_path(r'^get-galley/$', views.get_gallery, name="get-gallery"),
+    re_path(r'^get-youtube-links/$', views.get_youtube_links, name="get-youtube-links"),
 
     # ================admin================
     re_path(r'^add-achievement/$', views.add_achievement, name="add-achievement"),
@@ -42,6 +44,7 @@ urlpatterns =[
     re_path(r'^get-company-profile-count/$', views.get_company_profile_count, name="get-company-profile-count"),
     re_path(r'^edit-company-profile-count/(?P<pk>.*)/$', views.edit_company_profile_count, name="edit-company-profile-count"),
 
-     
-
+    re_path(r'^add-gallery-image/$', views.add_gallery_image, name="add-gallery"),
+    re_path(r'^get-galleries-admin/$', views.get_galleries, name="get-gallery"),
+    re_path(r'^delete-gallery-image/(?P<pk>.*)/$', views.delete_gallery_image, name="delete-gallery"),
 ]
