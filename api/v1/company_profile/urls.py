@@ -45,9 +45,4 @@ urlpatterns =[
 
     re_path(r'^add-gallery-image/$', views.add_gallery_image, name="add-gallery"),
     re_path(r'^delete-gallery-image/(?P<pk>.*)/$', views.delete_gallery_image, name="delete-gallery"),
-
-
-
-     
-
 ]
