@@ -839,6 +839,7 @@ def mark_as_complete(request, pk):
                 last_topic_id = last_topic_of_current_day['id']
 
                 if last_topic_type == 'audio':
+                    programme_status = False
                     if StudentDailyAudioTopic.objects.filter(daily_audio_topic__id=last_topic_id, student_profile=student, is_processed=True, is_completed=True, is_deleted=False).exists():
 
                         if (current_day := StudentDay.objects.filter(day=day, student=student, is_completed=False, is_deleted=False)).exists():
@@ -884,10 +885,12 @@ def mark_as_complete(request, pk):
                                     }
                             else:
                                 transaction.commit()
+                                programme_status = True
                                 response_data = {
                                     "StatusCode" : 6000,
                                     "data" : {
                                         "title" : "Success",
+                                        "programme_status" : programme_status,
                                         "message" : f"{programme} completed successfully"
                                     }
                                 }
@@ -908,6 +911,7 @@ def mark_as_complete(request, pk):
                             }
                         }
                 elif last_topic_type == 'video':
+                    programme_status = False
                     if StudentDailyVideoTopic.objects.filter(daily_video_topic__id=last_topic_id, student_profile=student, is_processed=True, is_completed=True, is_deleted=False).exists():
 
                         if (current_day := StudentDay.objects.filter(day=day, student=student, is_completed=False, is_deleted=False)).exists():
@@ -952,10 +956,12 @@ def mark_as_complete(request, pk):
                                     }
                             else:
                                 transaction.commit()
+                                programme_status = True
                                 response_data = {
                                     "StatusCode" : 6000,
                                     "data" : {
                                         "title" : "Success",
+                                        "programme_status" : programme_status,
                                         "message" : f"{programme} completed successfully"
                                     }
                                 }
@@ -976,6 +982,7 @@ def mark_as_complete(request, pk):
                             }
                         }  
                 elif last_topic_type == 'image':
+                    programme_status = False
                     if StudentDailyImageTopic.objects.filter(daily_image_topic__id=last_topic_id, student_profile=student, is_processed=True, is_completed=True, is_deleted=False).exists():
 
                         if (current_day := StudentDay.objects.filter(day=day, student=student, is_completed=False, is_deleted=False)).exists():
@@ -1021,10 +1028,12 @@ def mark_as_complete(request, pk):
                                     }
                             else:
                                 transaction.commit()
+                                programme_status = True
                                 response_data = {
                                     "StatusCode" : 6000,
                                     "data" : {
                                         "title" : "Success",
+                                        "programme_status" : programme_status,
                                         "message" : f"{programme} completed successfully"
                                     }
                                 }
@@ -1045,6 +1054,7 @@ def mark_as_complete(request, pk):
                             }
                         }
                 elif last_topic_type == 'text':
+                    programme_status = False
                     if StudentDailyTextTopic.objects.filter(daily_text_topic__id=last_topic_id, student_profile=student, is_processed=True, is_completed=True, is_deleted=False).exists():
                         if (current_day := StudentDay.objects.filter(day=day, student=student, is_completed=False, is_deleted=False)).exists():
                             current_day = current_day.latest("date_added")
@@ -1089,10 +1099,12 @@ def mark_as_complete(request, pk):
                                     }
                             else:
                                 transaction.commit()
+                                programme_status = True
                                 response_data = {
                                     "StatusCode" : 6000,
                                     "data" : {
                                         "title" : "Success",
+                                        "programme_status" : programme_status,
                                         "message" : f"{programme} completed successfully"
                                     }
                                 }
