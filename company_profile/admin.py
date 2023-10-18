@@ -2,20 +2,20 @@ from django.contrib import admin
 from company_profile.models import *
 
 class AchievementAdmin(admin.ModelAdmin):
-    list_display = ('title', 'image', 'description')
+    list_display = ('title', 'image', 'description', "alt")
 
 admin.site.register(Achievements, AchievementAdmin)
 
 
 class TestimonialAdmin(admin.ModelAdmin):
-    list_display = ('id', 'name', 'quote', 'image', 'video')
+    list_display = ('id', 'name', 'quote', 'image', 'video', "alt")
 
 
 admin.site.register(Testimonials, TestimonialAdmin)
 
 
 class OurTeamAdmin(admin.ModelAdmin):
-    list_display = ('id', 'name', 'photo', 'designation')
+    list_display = ('id', 'name', 'photo', 'designation', "alt")
 
 admin.site.register(OurTeam, OurTeamAdmin)
 
@@ -51,6 +51,6 @@ admin.site.register(Department, DepartmentAdmin)
 
 
 class GalleryAdmin(admin.ModelAdmin):
-    list_display = ('id', 'type', 'file', 'file_link')
+    list_display = ('id', 'type', 'file', 'file_link', "alt")
 
 admin.site.register(Gallery, GalleryAdmin)

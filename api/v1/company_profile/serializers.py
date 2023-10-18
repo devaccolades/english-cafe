@@ -15,6 +15,7 @@ class AchievementListSerializer(serializers.ModelSerializer):
             'id',
             'title',
             'image',
+            'alt'
         )
 
     def get_image(self, instance):
@@ -45,6 +46,7 @@ class TestimonialListSerializer(serializers.ModelSerializer):
             'rating_count',
             'image',
             'video',
+            'alt',
         )
 
     def get_image(self, instance):
@@ -110,7 +112,8 @@ class OurTeamListSerializer(serializers.ModelSerializer):
             'photo',
             'designation',
             'department',
-            'head'
+            'head',
+            'alt'
         )
 
     def get_photo(self, instance):
@@ -244,6 +247,7 @@ class ViewGalleryImageSerializer(serializers.ModelSerializer):
             'id',
             'type',
             'file',
+            'alt'
         )
         
 
@@ -266,6 +270,7 @@ class AdminListGallerySerializer(serializers.ModelSerializer):
             'id',
             'type',
             'file',
-            'file_link'
+            'file_link',
+            'alt',
         )
 
