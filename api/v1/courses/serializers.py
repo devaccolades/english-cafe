@@ -104,6 +104,7 @@ class DailyImageTopicSerializer(serializers.ModelSerializer):
         fields = (
             "id",
             "daily_image",
+            "alt",
             "order_id",
             "is_processed",
             "is_completed",
