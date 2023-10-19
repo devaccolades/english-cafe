@@ -272,5 +272,7 @@ class AdminListGallerySerializer(serializers.ModelSerializer):
             'file',
             'file_link',
             'alt',
+            'thumbnail',
+            'thumbnail_alt'
         )
 
