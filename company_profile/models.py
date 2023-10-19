@@ -38,6 +38,7 @@ COMPANY_PROFILE_GALLERY_SLOT = (
 class Achievements(BaseModel):
     title = models.CharField(max_length=255)
     image = models.ImageField(upload_to="company-profile/images/", blank=True, null=True)
+    alt = models.CharField(max_length=255,null=True, blank=True)
     description = models.TextField(blank=True, null=True)
 
     class Meta:
@@ -55,6 +56,7 @@ class Testimonials(BaseModel):
     quote = models.TextField()
     rating_count = models.PositiveIntegerField()
     image = models.ImageField(upload_to="company_profile/testimonials/images",  null=True, blank=True)
+    alt = models.CharField(max_length=255,null=True, blank=True)
     video = models.FileField(upload_to="company_profile/testimonials/video")
 
     class Meta:
@@ -84,6 +86,7 @@ class OurTeam(BaseModel):
     name = models.CharField(max_length=255)
     photo = models.FileField(upload_to="company_profile/our_team/photo", null=True, blank=True)
     designation = models.CharField(max_length=255)
+    alt = models.CharField(max_length=255,null=True, blank=True)
     head = models.BooleanField(default=False)
     department = models.ForeignKey("company_profile.Department", on_delete=models.CASCADE, null=True, blank=True)
 
@@ -164,6 +167,7 @@ class CompanyCount(BaseModel):
 class Gallery(BaseModel):
     type = models.CharField(choices=COMPANY_PROFILE_GALLERY_TYPE, max_length=255)
     file = models.FileField(upload_to='company_profile/gallery/', null=True, blank=True)
+    alt = models.CharField(max_length=255,null=True, blank=True)
     file_link = models.CharField(max_length=255, null=True, blank=True)
     slot = models.CharField(choices=COMPANY_PROFILE_GALLERY_SLOT, max_length=122, null=True, blank=True)
     

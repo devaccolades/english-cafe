@@ -51,7 +51,7 @@ admin.site.register(StudentDailyTextTopic,StudentDailyTextTopicAdmin)
 
 
 class DailyImageTopicAdmin(admin.ModelAdmin):
-    list_display = ("id", "day", "daily_image", "order_id")
+    list_display = ("id", "day", "daily_image", "order_id", "alt")
 
 admin.site.register(DailyImageTopic, DailyImageTopicAdmin)
 

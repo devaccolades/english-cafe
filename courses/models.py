@@ -183,6 +183,7 @@ class DailyImageTopic(BaseModel):
     day = models.ForeignKey('courses.Day', on_delete=models.CASCADE, null=True, blank=True)
     daily_image = models.FileField(upload_to="courses/image", blank=True, null=True)
     next_topic_id = models.CharField(max_length=255,null=True, blank=True)
+    alt = models.CharField(max_length=255,null=True, blank=True)
     order_id = models.PositiveIntegerField(blank=True, null=True)
 
     class Meta:
