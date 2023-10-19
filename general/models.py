@@ -1,6 +1,9 @@
 import uuid
 from django.db import models
 
+from ckeditor.fields import RichTextField
+
+
 
 class BaseModel(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -30,5 +33,35 @@ class Country(models.Model):
 
     def __str__(self):
         return self.name
+    
+
+class Blog(BaseModel):
+    title = models.CharField(max_length=125, null=True, blank=True)
+    sub_title = models.CharField(max_length=125, null=True, blank=True)
+    descriprtion = RichTextField()
+    thumbnail = models.ImageField(upload_to="blogs/images/", null=True, blank=True)
+    thumbnail_alt = models.CharField(max_length=125, null=True, blank=True)
+    image = models.ImageField(upload_to="blogs/images/", null=True, blank=True)
+    image_alt = models.CharField(max_length=125, null=True, blank=True)
+    tags = models.CharField(max_length=125, null=True, blank=True)
+    author = models.CharField(max_length=125, null=True, blank=True)
+    meta_title = models.CharField(max_length=125, null=True, blank=True)
+    meta_description = models.CharField(max_length=125, null=True, blank=True)
+    slug = models.CharField(max_length=125, null=True, blank=True)
+    created_at = models.DateField(null=True, blank=True)
+
+    class Meta:
+        db_table = 'company_profile_blog'
+        verbose_name = ('Blog')
+        verbose_name_plural = ('Blogs')
+        ordering = ('id',)
+
+    def __str__(self):
+        return self.title
+
+
+
+
+
 
         
