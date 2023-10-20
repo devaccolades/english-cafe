@@ -1762,8 +1762,6 @@ def add_gallery_image(request):
             slot = request.data.get("slot")
             thumbnail = request.data.get("thumbnail")
 
-            print(thumbnail,"=-=-=-=-=-")
-
             if gallery_type == 'image':
                 gallery = Gallery.objects.create(
                     auto_id = get_auto_id(Gallery),
