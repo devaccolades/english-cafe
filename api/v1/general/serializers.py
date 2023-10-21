@@ -36,3 +36,7 @@ class ListBlogSerializer(serializers.ModelSerializer):
         else:
             return None
         
+
+
+        
+        
