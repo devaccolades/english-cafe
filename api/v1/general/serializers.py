@@ -11,6 +11,7 @@ class ListBlogSerializer(serializers.ModelSerializer):
         fields = (
             'id',
             'title',
+            'sub_title',
             'description',
             'thumbnail',
             'image',
