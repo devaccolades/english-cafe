@@ -247,6 +247,7 @@ class ViewGalleryImageSerializer(serializers.ModelSerializer):
             'id',
             'type',
             'file',
+            'thumbnail',
             'alt'
         )
         
