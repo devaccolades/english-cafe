@@ -579,6 +579,7 @@ def daily_topic_complete(request, pk):
       
             elif (image_topic := DailyImageTopic.objects.filter(pk=pk, is_deleted=False)).exists():
                 image_topic = image_topic.latest("date_added")
+                print(image_topic.order_id,"-=-=-=-=-=-=-=-=-=-=-=-")
                 next_topic_id = image_topic.next_topic_id
 
                 if not StudentDailyImageTopic.objects.filter(daily_image_topic=image_topic, student_profile=student_profile, is_processed=True, is_deleted=False).exists():
