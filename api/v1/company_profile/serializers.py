@@ -260,6 +260,7 @@ class ViewGalleryYoutubeLinksSerializer(serializers.ModelSerializer):
             'id',
             'type',
             'file_link'
+            'thumbnail',
         )
 
 
