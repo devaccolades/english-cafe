@@ -1760,6 +1760,7 @@ def add_gallery_image(request):
             file = request.data.get("file")
             file_link = request.data.get("file_link")
             slot = request.data.get("slot")
+            thumbnail = request.data.get("thumbnail")
 
             if gallery_type == 'image':
                 gallery = Gallery.objects.create(
@@ -1796,7 +1797,8 @@ def add_gallery_image(request):
                 gallery = Gallery.objects.create(
                     auto_id = get_auto_id(Gallery),
                     type = gallery_type,
-                    file_link = file_link
+                    file_link = file_link,
+                    thumbnail = thumbnail
                 )
 
                 transaction.commit()

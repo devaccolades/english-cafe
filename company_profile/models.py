@@ -170,7 +170,8 @@ class Gallery(BaseModel):
     alt = models.CharField(max_length=255,null=True, blank=True)
     file_link = models.CharField(max_length=255, null=True, blank=True)
     slot = models.CharField(choices=COMPANY_PROFILE_GALLERY_SLOT, max_length=122, null=True, blank=True)
-    
+    thumbnail = models.ImageField(upload_to='company_profile/gallery/thumbnail/', null=True, blank=True)
+    thumbnail_alt = models.CharField(max_length=255,null=True, blank=True)
     class Meta:
         db_table = 'courses_gallery'
         verbose_name = ('Gallery')
