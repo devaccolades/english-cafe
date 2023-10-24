@@ -52,3 +52,45 @@ def list_blogs(request):
         }
 
     return Response({'app_data': response_data}, status=status.HTTP_200_OK)
+
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def single_blog(request, pk):
+    try:
+        if (blogs := Blog.objects.filter(pk=pk, is_deleted=False)).exists():
+            blog = blogs.latest('date_added')
+
+            serialized_data = ListBlogSerializer(
+                blog,
+                context = {
+                    "request" : request
+                },
+            ).data
+
+            response_data = {
+                "StatusCode": 6000,
+                "data" : serialized_data
+            }
+        else:
+            response_data = {
+                "StatusCode" : 6001,
+                "data" : []
+            }
+
+        transaction.set_autocommit(False)
+    except Exception as e:
+        transaction.rollback()
+        errType = e.__class__.__name__
+        errors = {
+            errType: traceback.format_exc()
+        }
+        response_data = {
+            "status": 0,
+            "api": request.get_full_path(),
+            "request": request.data,
+            "message": str(e),
+            "response": errors
+        }
+
+    return Response({'app_data': response_data}, status=status.HTTP_200_OK)
