@@ -38,7 +38,7 @@ class Country(models.Model):
 class Blog(BaseModel):
     title = models.CharField(max_length=125, null=True, blank=True)
     sub_title = models.CharField(max_length=125, null=True, blank=True)
-    descriprtion = RichTextField()
+    description = RichTextField()
     thumbnail = models.ImageField(upload_to="blogs/images/", null=True, blank=True)
     thumbnail_alt = models.CharField(max_length=125, null=True, blank=True)
     image = models.ImageField(upload_to="blogs/images/", null=True, blank=True)

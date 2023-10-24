@@ -9,7 +9,7 @@ admin.site.register(Country,CountryAdmin)
 
 
 class BlogAdmin(admin.ModelAdmin):
-    list_display = ('auto_id', 'id', 'created_at', 'title', 'descriprtion', 'thumbnail', 'image', 'date_added', 'tags', 'author', 'meta_title', 'meta_description', 'slug')
+    list_display = ('auto_id', 'id', 'created_at', 'title', 'description', 'thumbnail', 'image', 'date_added', 'tags', 'author', 'meta_title', 'meta_description', 'slug')
     ordering = ('auto_id',)
     search_fields = ('tags', 'title')
 
