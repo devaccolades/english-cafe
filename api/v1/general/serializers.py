@@ -17,7 +17,6 @@ class ListBlogSerializer(serializers.ModelSerializer):
             'image',
             'tags',
             'author',
-            'meta_description',
             'slug',
             'created_at'
         )
