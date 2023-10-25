@@ -2,6 +2,7 @@ import uuid
 from django.db import models
 
 from ckeditor.fields import RichTextField
+from django.template.defaultfilters import slugify
 
 
 
@@ -45,9 +46,9 @@ class Blog(BaseModel):
     image_alt = models.CharField(max_length=125, null=True, blank=True)
     tags = models.CharField(max_length=125, null=True, blank=True)
     author = models.CharField(max_length=125, null=True, blank=True)
-    meta_title = models.CharField(max_length=125, null=True, blank=True)
-    meta_description = models.CharField(max_length=125, null=True, blank=True)
-    slug = models.CharField(max_length=125, null=True, blank=True)
+    meta_title = models.CharField(max_length=200, null=True, blank=True)
+    meta_description = models.CharField(max_length=200, null=True, blank=True)
+    slug = models.SlugField(unique=True, default="")
     created_at = models.DateField(null=True, blank=True)
 
     class Meta:
