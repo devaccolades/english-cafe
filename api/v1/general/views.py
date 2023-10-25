@@ -17,6 +17,7 @@ from api.v1.general.serializers import ListBlogSerializer
 def list_blogs(request):
     try:
         if (blogs := Blog.objects.filter(is_deleted=False)).exists():
+            blogs = blogs.order_by("date_added")
 
             serialized_data = ListBlogSerializer(
                 blogs,
