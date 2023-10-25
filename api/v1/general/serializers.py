@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from general.models import Blog
+from general.models import Blog, Tags
 
 
 class ListBlogSerializer(serializers.ModelSerializer):
@@ -35,6 +35,15 @@ class ListBlogSerializer(serializers.ModelSerializer):
             return date
         else:
             return None
+        
+
+class ListTagsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Tags
+        fields = (
+            'id',
+            'name'
+        )
         
 
 
