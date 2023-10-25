@@ -56,9 +56,9 @@ def list_blogs(request):
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
-def single_blog(request, pk):
+def single_blog(request, slug):
     try:
-        if (blogs := Blog.objects.filter(pk=pk, is_deleted=False)).exists():
+        if (blogs := Blog.objects.filter(slug=slug, is_deleted=False)).exists():
             blog = blogs.latest('date_added')
 
             serialized_data = ListBlogSerializer(
