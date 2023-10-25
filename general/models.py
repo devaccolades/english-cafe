@@ -44,12 +44,12 @@ class Blog(BaseModel):
     thumbnail_alt = models.CharField(max_length=125, null=True, blank=True)
     image = models.ImageField(upload_to="blogs/images/", null=True, blank=True)
     image_alt = models.CharField(max_length=125, null=True, blank=True)
-    tags = models.CharField(max_length=125, null=True, blank=True)
     author = models.CharField(max_length=125, null=True, blank=True)
     meta_title = models.CharField(max_length=200, null=True, blank=True)
     meta_description = models.CharField(max_length=200, null=True, blank=True)
     slug = models.SlugField(unique=True, default="")
     created_at = models.DateField(null=True, blank=True)
+    tags = models.ManyToManyField("general.Tags", blank=True)
 
     class Meta:
         db_table = 'company_profile_blog'
@@ -59,6 +59,19 @@ class Blog(BaseModel):
 
     def __str__(self):
         return self.title
+
+
+class Tags(BaseModel):
+    name = models.CharField(max_length=125, null=True, blank=True)
+
+    class Meta:
+        db_table = 'company_profile_tags'
+        verbose_name = ('Tag')
+        verbose_name_plural = ('Tags')
+        ordering = ('date_added',)
+
+    def __str__(self):
+        return self.name
 
 
 
