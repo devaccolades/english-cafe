@@ -5,6 +5,7 @@ from general.models import Blog, Tags
 
 class ListBlogSerializer(serializers.ModelSerializer):
     created_at = serializers.SerializerMethodField()
+    tags = serializers.SerializerMethodField()
 
     class Meta:
         model = Blog
@@ -15,10 +16,10 @@ class ListBlogSerializer(serializers.ModelSerializer):
             'description',
             'thumbnail',
             'image',
-            'tags',
             'author',
             'slug',
-            'created_at'
+            'created_at',
+            'tags',
         )
 
     
@@ -35,6 +36,22 @@ class ListBlogSerializer(serializers.ModelSerializer):
             return date
         else:
             return None
+        
+    def get_tags(self, instance):
+        request = self.context['request']
+        if instance.tags:
+            tag_instance = instance.tags.all()
+            serialized_data = ListTagsSerializer(
+                tag_instance,
+                context = {
+                    "request" : request
+                },
+                many=True
+            ).data
+
+            return serialized_data
+        else:
+            return []
         
 
 class ListTagsSerializer(serializers.ModelSerializer):
