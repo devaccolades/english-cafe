@@ -159,10 +159,7 @@ class DailyVideoTopicSerializer(serializers.ModelSerializer):
         request = self.context['request']
         if instance.video:
             video_url =  request.build_absolute_uri(instance.video.url)
-            with open(video_url, 'rb') as video_file:
-                video_link = FileResponse(video_file)
-                video_link['Content-Type'] = 'video/mp4'
-                return video_link
+            return video_url
         else:
             return None
     
