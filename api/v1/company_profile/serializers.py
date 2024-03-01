@@ -286,3 +286,13 @@ class AdminListGallerySerializer(serializers.ModelSerializer):
             'thumbnail_alt'
         )
 
+
+class WhatsAppNumberEnquirySerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = WhatsAppNumberEnquiry
+        fields = (
+            'id',
+            'phone'
+        )
+
