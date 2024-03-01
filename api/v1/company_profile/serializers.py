@@ -159,12 +159,14 @@ class AddCareerEnquirySerializer(serializers.Serializer):
 class CareerEnquirySerializer(serializers.ModelSerializer):
     job = serializers.SerializerMethodField()
     cv = serializers.SerializerMethodField()
+    date_added = serializers.SerializerMethodField()
 
     class Meta:
         model = CareerEnquiry
         fields = (
             'id',
             'job',
+            'date_added',
             'name',
             'phone',
             'email',
@@ -174,6 +176,12 @@ class CareerEnquirySerializer(serializers.ModelSerializer):
     def get_job(self,instance):
         if instance.job:
             return instance.job.designation
+        else:
+            return None
+        
+    def get_date_added(self, instance):
+        if instance.date_added:
+            return instance.date_added.date()
         else:
             return None
         

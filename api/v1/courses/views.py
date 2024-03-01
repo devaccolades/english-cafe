@@ -260,8 +260,21 @@ def get_daily_topics(request, pk):
                 }
             }
         return Response({'app_data': response_data}, status=status.HTTP_200_OK)
-    except Exception as E:
-        return Response({'app_data': 'something went wrong', 'dev_data': str(E)}, status=status.HTTP_400_BAD_REQUEST)
+    except Exception as e:
+        transaction.rollback()
+        errType = e.__class__.__name__
+        errors = {
+            errType: traceback.format_exc()
+        }
+        response_data = {
+            "status": 0,
+            "api": request.get_full_path(),
+            "request": request.data,
+            "message": str(e),
+            "response": errors
+        }
+
+    return Response({'app_data': response_data}, status=status.HTTP_200_OK)
     
 
 @api_view(['GET'])
@@ -388,7 +401,6 @@ def get_admin_daily_topics(request, pk):
                 }
             }
        
-        return Response({'app_data': response_data}, status=status.HTTP_200_OK)
     except Exception as e:
         transaction.rollback()
         errType = e.__class__.__name__
@@ -402,7 +414,8 @@ def get_admin_daily_topics(request, pk):
             "message": str(e),
             "response": errors
         }
-        return Response({'app_data': response_data}, status=status.HTTP_200_OK)
+        
+    return Response({'app_data': response_data}, status=status.HTTP_200_OK)
 
     
 
