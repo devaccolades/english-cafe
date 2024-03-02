@@ -11,6 +11,8 @@ urlpatterns =[
     re_path(r'^create-enquiry-email/$', views.create_enquiry, name="send-email"),
     re_path(r'^get-galley/$', views.get_gallery, name="get-gallery"),
     re_path(r'^get-youtube-links/$', views.get_youtube_links, name="get-youtube-links"),
+    re_path(r'^get-whatsapp-number/$', views.get_list_whatsapp_number, name="get-list-whatsapp-number"), 
+    re_path(r'^get-whatsapp-number-user/$', views.get_list_whatsapp_number_user, name="get-list-whatsapp-number-user"), 
 
     # ================admin================
     re_path(r'^add-achievement/$', views.add_achievement, name="add-achievement"),
