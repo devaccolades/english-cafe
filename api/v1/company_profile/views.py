@@ -1975,13 +1975,13 @@ def get_list_whatsapp_number(request):
 def get_list_whatsapp_number_user(request):
     try:
         if (whatsapp_number := WhatsAppNumberEnquiry.objects.filter(is_deleted=False)).exists():
+            whatsapp_number = whatsapp_number.latest("date_added")
 
             serialized_data = WhatsAppNumberEnquirySerializer(
                 whatsapp_number,
                 context = {
                     "request": request
                 },
-                many = True
             ).data
 
             response_data = {
