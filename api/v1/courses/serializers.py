@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from courses.models import *
 from general.encryptions import decrypt 
+from django.http import FileResponse
 
 
 class StudentDayListSerializer(serializers.ModelSerializer):
@@ -137,6 +138,7 @@ class DailyImageTopicSerializer(serializers.ModelSerializer):
 
 
 class DailyVideoTopicSerializer(serializers.ModelSerializer):
+    video = serializers.SerializerMethodField()
     is_processed = serializers.SerializerMethodField()
     is_completed = serializers.SerializerMethodField()
 
@@ -151,6 +153,15 @@ class DailyVideoTopicSerializer(serializers.ModelSerializer):
             "next_topic_id"
 
         )
+
+    
+    def get_video(self, instance):
+        request = self.context['request']
+        if instance.video:
+            video_url =  request.build_absolute_uri(instance.video.url)
+            return video_url
+        else:
+            return None
     
     def get_is_processed(self, instance):
         student = self.context['student_id']

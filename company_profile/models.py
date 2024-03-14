@@ -182,3 +182,16 @@ class Gallery(BaseModel):
         return self.type
 
 
+class WhatsAppNumberEnquiry(BaseModel):
+    phone = models.CharField(max_length=128, null=True, blank=True)
+
+    class Meta:
+        db_table = 'company_profile_whatsapp_number_enquiry'
+        verbose_name = ('Whatsapp Number Enquiry')
+        verbose_name_plural = ('Whatsapp Number Enquiries')
+        ordering = ('id',)
+
+    def __str__(self):
+        return str(self.phone)
+
+

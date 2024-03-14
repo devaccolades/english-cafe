@@ -54,3 +54,9 @@ class GalleryAdmin(admin.ModelAdmin):
     list_display = ('id', 'type', 'file', 'file_link', "alt")
 
 admin.site.register(Gallery, GalleryAdmin)
+
+
+class WhatsAppNumberEnquiryAdmin(admin.ModelAdmin):
+    list_display = ('id', 'phone')
+
+admin.site.register(WhatsAppNumberEnquiry, WhatsAppNumberEnquiryAdmin)

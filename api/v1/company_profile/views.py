@@ -1930,6 +1930,179 @@ def get_galleries(request):
     return Response({'app_data': response_data}, status=status.HTTP_200_OK)
 
 
+@api_view(['GET'])
+@group_required(['EnglishCafe'])
+def get_list_whatsapp_number(request):
+    try:
+        if (whatsapp_number := WhatsAppNumberEnquiry.objects.filter(is_deleted=False)).exists():
+
+            serialized_data = WhatsAppNumberEnquirySerializer(
+                whatsapp_number,
+                context = {
+                    "request": request
+                },
+                many = True
+            ).data
+
+            response_data = {
+                "StatusCode" : 6000,
+                "data" : serialized_data
+            }
+        else:
+            response_data = {
+                "StatusCode" : 6001,
+                "data" : []
+            }
+    except  Exception as e:
+        transaction.rollback()
+        errType = e.__class__.__name__
+        errors = {
+            errType: traceback.format_exc()
+        }
+        response_data = {
+            "status": 0,
+            "api": request.get_full_path(),
+            "request": request.data,
+            "message": str(e),
+            "response": errors
+        }
+
+    return Response({'app_data': response_data}, status=status.HTTP_200_OK)
+
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_list_whatsapp_number_user(request):
+    try:
+        if (whatsapp_number := WhatsAppNumberEnquiry.objects.filter(is_deleted=False)).exists():
+            whatsapp_number = whatsapp_number.latest("date_added")
+
+            serialized_data = WhatsAppNumberEnquirySerializer(
+                whatsapp_number,
+                context = {
+                    "request": request
+                },
+            ).data
+
+            response_data = {
+                "StatusCode" : 6000,
+                "data" : serialized_data
+            }
+        else:
+            response_data = {
+                "StatusCode" : 6001,
+                "data" : []
+            }
+    except  Exception as e:
+        transaction.rollback()
+        errType = e.__class__.__name__
+        errors = {
+            errType: traceback.format_exc()
+        }
+        response_data = {
+            "status": 0,
+            "api": request.get_full_path(),
+            "request": request.data,
+            "message": str(e),
+            "response": errors
+        }
+
+    return Response({'app_data': response_data}, status=status.HTTP_200_OK)
+
+
+@api_view(['GET'])
+@group_required(['EnglishCafe'])
+def single_whatsapp_number(request, pk):
+    try:
+        if (whatsapp_number := WhatsAppNumberEnquiry.objects.filter(pk=pk, is_deleted=False)).exists():
+            whatsapp_number = whatsapp_number.latest("date_added")
+
+            serialized_data = WhatsAppNumberEnquirySerializer(
+                whatsapp_number,
+                context = {
+                    "request" : request
+                },
+            ).data
+
+            response_data = {
+                "StatusCode" : 6000,
+                "data" : serialized_data
+            }
+        else:
+            response_data = {
+                "StatusCode" : 6001,
+                "data" : {
+                    "title" : "Failed",
+                    "message" : "Whatsapp number not found"
+                }
+            }
+    except  Exception as e:
+        transaction.rollback()
+        errType = e.__class__.__name__
+        errors = {
+            errType: traceback.format_exc()
+        }
+        response_data = {
+            "status": 0,
+            "api": request.get_full_path(),
+            "request": request.data,
+            "message": str(e),
+            "response": errors
+        }
+
+    return Response({'app_data': response_data}, status=status.HTTP_200_OK)
+
+
+@api_view(['POST'])
+@group_required(['EnglishCafe'])
+def edit_whatsapp_number(request, pk):
+    try:
+        transaction.set_autocommit(False)
+        phone = request.data.get("phone")
+
+        if (whatsapp_number := WhatsAppNumberEnquiry.objects.filter(pk=pk, is_deleted=False)).exists():
+            whatsapp_number = whatsapp_number.latest("date_added")
+
+            if phone:
+                whatsapp_number.phone = phone
+            whatsapp_number.save()
+
+            transaction.commit()
+            response_data = {
+                "StatusCode" : 6000,
+                "data" : {
+                    "title" : "Success",
+                    "message" : "Whatsapp number edited successfully"
+                }
+            }
+        else:
+            response_data = {
+                "StatusCode" : 6001,
+                "data" : {
+                    "title" : "Failed",
+                    "message" : "Whatsapp number not found"
+                }
+            }
+    except  Exception as e:
+        transaction.rollback()
+        errType = e.__class__.__name__
+        errors = {
+            errType: traceback.format_exc()
+        }
+        response_data = {
+            "status": 0,
+            "api": request.get_full_path(),
+            "request": request.data,
+            "message": str(e),
+            "response": errors
+        }
+
+    return Response({'app_data': response_data}, status=status.HTTP_200_OK)
+
+
+
+
+
 
     
 

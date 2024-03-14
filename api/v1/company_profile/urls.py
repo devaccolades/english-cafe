@@ -11,6 +11,8 @@ urlpatterns =[
     re_path(r'^create-enquiry-email/$', views.create_enquiry, name="send-email"),
     re_path(r'^get-galley/$', views.get_gallery, name="get-gallery"),
     re_path(r'^get-youtube-links/$', views.get_youtube_links, name="get-youtube-links"),
+    re_path(r'^get-whatsapp-number/$', views.get_list_whatsapp_number, name="get-list-whatsapp-number"), 
+    re_path(r'^get-whatsapp-number-user/$', views.get_list_whatsapp_number_user, name="get-list-whatsapp-number-user"), 
 
     # ================admin================
     re_path(r'^add-achievement/$', views.add_achievement, name="add-achievement"),
@@ -47,4 +49,9 @@ urlpatterns =[
     re_path(r'^add-gallery-image/$', views.add_gallery_image, name="add-gallery"),
     re_path(r'^get-galleries-admin/$', views.get_galleries, name="get-gallery"),
     re_path(r'^delete-gallery-image/(?P<pk>.*)/$', views.delete_gallery_image, name="delete-gallery"),
+
+    re_path(r'^get-whatsapp-number/$', views.get_list_whatsapp_number, name="get-list-whatsapp-number"), 
+    re_path(r'^single-whatsapp-number/(?P<pk>.*)/$', views.single_whatsapp_number, name="single-whatsapp-number"), 
+    re_path(r'^edit-whatsapp-number/(?P<pk>.*)/$', views.edit_whatsapp_number, name="edit-whatsapp-number"), 
+
 ]
