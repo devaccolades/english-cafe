@@ -7,6 +7,7 @@ urlpatterns = [
     re_path(r'^list-blogs/$', views.list_blogs, name="programmes"),
     re_path(r'^list-tags/$', views.list_tags, name="tags"),
     re_path(r'^list-blogs-tags/(?P<pk>.*)/$', views.list_blogs_tags, name="blog-tags"),
+    re_path(r'^single-blogs/(?P<slug>.*)/$', views.single_blog, name="singleblog"),
 
 
 ]
