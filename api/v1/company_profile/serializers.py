@@ -194,7 +194,7 @@ class CareerEnquirySerializer(serializers.ModelSerializer):
         
     
 class EnquiryListSerializer(serializers.ModelSerializer):
-
+    date_added = serializers.SerializerMethodField()
     class Meta:
         model = Enquiry
         fields = (
@@ -202,8 +202,11 @@ class EnquiryListSerializer(serializers.ModelSerializer):
             'name',
             'phone',
             'email',
-            'message'
+            'message',
+            'date_added'
         )
+    def get_date_added(self, obj):  
+            return obj.date_added.strftime("%d/%m/%Y") 
 
 
 class CreateEnquirySerializer(serializers.Serializer):
