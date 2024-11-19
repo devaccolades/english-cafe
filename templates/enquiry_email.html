@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Enquiry PDF</title>
+    <style>
+        td, th {
+            padding: 5px;
+            text-align: center;
+            word-wrap: break-word;  /* Allows long words to break and wrap */
+            word-break: break-all;  /* Breaks long words if necessary */
+            max-width: 200px; 
+            text-wrap: wrap;
+        }
+        th {
+            text-align: center;
+        }
+        table {
+            width: 100%;  /* Ensure table takes up full width */
+            table-layout: fixed;  /* Ensures columns take up even space */
+        }
+    </style>
+</head>
+<body>
+    <h1>Report Details</h1>
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Number</th>
+                <th>Email</th>
+                <th>Message</th>
+                <th>Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in enquiries %}
+            <tr>
+                <td>{{ item.name }}</td>
+                <td>{{ item.phone }}</td>
+                <td>{{ item.email }}</td>
+                <td>{{ item.message }}</td>
+                <td>{{ item.date_added }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>

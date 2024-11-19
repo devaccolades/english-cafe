@@ -1412,7 +1412,36 @@ def get_enquiry(request):
         }
 
         return Response({'app_data': response_data}, status=status.HTTP_200_OK)
-    
+
+from django.template.loader import get_template
+from django.http import HttpResponse
+from xhtml2pdf import pisa
+
+def generate_pdf(template_src, context_dict={}):
+    """Generate PDF from HTML template."""
+    try:
+        template = get_template(template_src)  
+        html = template.render(context_dict) 
+        response = HttpResponse(content_type='application/pdf')
+        response['Content-Disposition'] = 'attachment; filename="enquiry_list.pdf"'
+        pisa_status = pisa.CreatePDF(html, dest=response)  
+        if pisa_status.err:
+            return HttpResponse(f'We had some errors <pre>{html}</pre>')  
+    except Exception as e:
+        print(e) 
+        return HttpResponse('An error occurred while generating the PDF.')
+    return response
+
+
+@api_view(['GET'])
+@permission_classes([AllowAny,])
+def get_enquiry_list_download(request):
+    """View to download the enquiry list as a PDF."""
+    enquiries = Enquiry.objects.all() 
+    serializer = EnquiryListSerializer(enquiries, many=True)
+    context = {'enquiries': serializer.data}
+    return generate_pdf('enquiry_email.html', context)
+
 
 @api_view(['POST'])
 @permission_classes([AllowAny,])

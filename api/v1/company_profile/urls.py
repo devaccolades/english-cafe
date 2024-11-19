@@ -41,6 +41,7 @@ urlpatterns =[
 
     re_path(r'^get-career-enquiry/$', views.get_career_enquiry, name="get-career-enquiry"),
     re_path(r'^get-enquiry/$', views.get_enquiry, name="get-enquiry"),
+    re_path(r'^enquiry/download/$', views.get_enquiry_list_download, name="enquiry-list-download"),
 
     re_path(r'^add-company-profile-count/$', views.add_company_profile_count, name="add-company-profile-count"),
     re_path(r'^get-company-profile-count/$', views.get_company_profile_count, name="get-company-profile-count"),
